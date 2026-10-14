@@ -132,15 +132,33 @@ def metrics_from_confusion(matrix):
     subset such as the smoke test, whose macro F1 is a plumbing diagnostic and
     not a result.
     """
+    per_class = per_class_from_confusion(matrix)
+    accuracy = (per_class["true_positive"].sum() / matrix.sum()).item()
+    return accuracy, per_class["f1"].mean().item()
+
+
+def per_class_from_confusion(matrix):
+    """Per-class counts, recall, and F1 for all NUM_CLASSES labels.
+
+    The scalar metrics above are built from these, so failure analysis and the
+    headline numbers cannot drift apart: macro F1 is by construction the mean of
+    the `f1` vector returned here, over the same 43 entries and with the same
+    zero-denominator convention. Recall uses the true-sample count as its
+    denominator and is 0 for a class with no true samples, matching the policy.
+    """
     true_positive = matrix.diagonal().to(torch.float64)
     predicted = matrix.sum(dim=0).to(torch.float64)
     actual = matrix.sum(dim=1).to(torch.float64)
-    accuracy = (true_positive.sum() / matrix.sum()).item()
     denominator = predicted + actual
-    per_class_f1 = torch.where(
-        denominator > 0, 2 * true_positive / denominator, torch.zeros_like(denominator)
-    )
-    return accuracy, per_class_f1.mean().item()
+    return {
+        "true_positive": true_positive,
+        "predicted": predicted,
+        "support": actual,
+        "recall": torch.where(actual > 0, true_positive / actual, torch.zeros_like(actual)),
+        "f1": torch.where(
+            denominator > 0, 2 * true_positive / denominator, torch.zeros_like(denominator)
+        ),
+    }
 
 
 def run_training_epoch(model, loader, criterion, optimizer, device, max_batches=None):
