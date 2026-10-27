@@ -1,0 +1,12 @@
+{
+  "protocol": "controlled corruption-augmentation comparison on GTSRB",
+  "document": "docs/augmentation_protocol.md",
+  "algorithm": "sha256",
+  "files": {
+    "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+    "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+    "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+  },
+  "recorded_by": "src/augmentation.py:protocol_digests",
+  "note": "Digests of the frozen protocol document and of the two modules that implement the distributions it describes. Every training run writes a protocol.json beside its checkpoint holding the digests it observed at startup, so a run started against edited files is recorded as such. The sidecar is written beside the checkpoint and not inside it: it dates a run against this protocol, it does not prove which code produced a given checkpoint."
+}
