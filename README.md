@@ -324,6 +324,34 @@ the recorded digests. A fresh clone therefore has to write its own inventory
 for its own nine checkpoints, in the same schema, before this stage will run.
 That reproduces the methodology, not the accepted evaluation.
 
+### Figures
+
+The four figures under `figures/` are drawn from the tables
+`src.compare_test` wrote. No error rate and no interval is recomputed; the only
+aggregation the figures add is the mean across the three seeds, which
+reproduces `across_seeds.csv`.
+
+```sh
+.venv/bin/python -m src.plot_paper_figures
+```
+
+The script reads `artifacts/analysis/final_test/` and writes a PDF and a PNG
+for each figure; `--analysis-dir` and `--figure-dir` move either end. It stops
+if that directory does not record the official test split, since the same table
+names are written for validation.
+
+* [Figure 1](figures/fig1_overall_corruption_error.pdf) — mean per-image error
+  for the three policies on each suite, with the three seeds also marked
+  individually.
+* [Figure 2](figures/fig2_per_family_contrasts.pdf) — the B−A and C−B
+  differences family by family, both columns ordered by the B−A effect so the
+  rows line up. The four panels carry different horizontal scales, as the
+  figure states.
+* [Figure 3](figures/fig3_severity.pdf) — error against severity levels 1 to 5,
+  and the C−B difference at each level.
+* [Figure 4](figures/fig4_clean_versus_corruption.pdf) — clean accuracy against
+  corruption error for all nine checkpoints.
+
 ### What the repository does and does not contain
 
 `artifacts/` is Git-ignored in its entirety, so checkpoints, per-image
@@ -358,6 +386,7 @@ src/
                            analyze_placement.py and evaluate_placement.py
   analyze_failures.py      per-class and per-condition failure breakdown,
                            plotted by plot_failures.py
+  plot_paper_figures.py    the four paper figures, from the test analysis
   plot_robustness.py       degradation curves
   visualize_corruptions.py severity grids for each family
   README.md                data pipeline and baseline, with the design reasoning
@@ -368,6 +397,8 @@ docs/
   final_test_findings.md   the official test results and their limitations
 notebooks/
   01_data_exploration.ipynb
+figures/
+  fig1 .. fig4             the paper figures, PDF and PNG
 ```
 
 ## Limitations
