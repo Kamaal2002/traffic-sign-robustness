@@ -159,6 +159,13 @@ DECLARED_HELDOUT = {
 # Modules whose contents the accepted results depend on. Verified clean against
 # HEAD, because "the benchmark was frozen before any model was trained" is the
 # claim the whole comparison rests on.
+#
+# The last two were added when the test path was implemented. `TestSuite`
+# subclasses `evaluate_checkpoint.Suite` and `compare_test.py` imports the
+# contrast list, the clean-accuracy limit and the decision rule from
+# `compare_models.py`, so an edit to either file while writing the test modules
+# would move a committed validation number, or the rule that reads it, without
+# tripping any other gate.
 FROZEN_MODULES = (
     "src/corruptions.py",
     "src/data.py",
@@ -166,6 +173,8 @@ FROZEN_MODULES = (
     "src/train.py",
     "src/evaluate_robustness.py",
     "src/analyze_placement.py",
+    "src/evaluate_checkpoint.py",
+    "src/compare_models.py",
 )
 
 SAMPLES = 4000
@@ -1163,11 +1172,33 @@ def check_output_guard():
         raise AssertionError(f"{target} was accepted as a training output "
                              "directory")
     assert ACCEPTED_BASELINE in PROTECTED_DIRS
+    # Where a replicate goes is checked as path arithmetic, because seeds 43
+    # and 44 have since been trained: `artifacts/clean_seed43` now holds a
+    # checkpoint, so the guard refuses it, which is the guard working rather
+    # than this check failing. The acceptance half therefore runs on a
+    # temporary directory of the same name, and the real directories are
+    # required to be refused once they hold output. Nothing here reads,
+    # writes, or removes a training artifact.
+    trained = []
     for seed in (43, 44):
         target = default_output_dir(seed)
         assert target != ACCEPTED_BASELINE
-        assert check_output_dir(target) == target.resolve()
-        assert not target.exists(), f"{target} was created by a check"
+        assert target.name == f"clean_seed{seed}"
+        assert target.parent == ACCEPTED_BASELINE.parent
+        with tempfile.TemporaryDirectory() as directory:
+            fresh = Path(directory) / target.name
+            assert check_output_dir(fresh) == fresh.resolve()
+            assert not fresh.exists(), f"{fresh} was created by a check"
+        if not target.exists():
+            continue
+        trained.append(target.name)
+        try:
+            check_output_dir(target)
+        except RuntimeError as error:
+            assert "already holds" in str(error), error
+        else:
+            raise AssertionError(f"{target} holds a finished run but was "
+                                 "accepted as a training output directory")
     with tempfile.TemporaryDirectory() as directory:
         fresh = Path(directory) / "clean_seed43"
         assert claim_output_dir(fresh).is_dir()
@@ -1195,6 +1226,10 @@ def check_output_guard():
           f"{default_output_dir(44).name}, a directory holding any training "
           "artifact is refused, and a seed-42 replicate with no output "
           "directory refuses to start")
+    if trained:
+        print(f"  the already-trained {', '.join(trained)} are refused as "
+              "output directories, so this check stays runnable after the "
+              "replicates exist")
 
 
 def check_output_writer():
