@@ -1,13 +1,21 @@
 """Checks on the official-test evaluation path that read no official test image.
 
     PYTHONPATH=. .venv/bin/python -m src.verify_test_path
+    PYTHONPATH=. .venv/bin/python -m src.verify_test_path --post-run
 
 Everything the test evaluator and the test comparison do is exercised here on
 synthetic images, synthetic labels and synthetic prediction files. The official
 test split is never decoded, its loader is never iterated, no checkpoint is
-loaded, and no test metric is produced - so this module can be run before the
-test evaluation as well as after it, and running it does not spend a look at
+loaded, and no test metric is produced, so running it does not spend a look at
 the test set.
+
+It runs in two modes. By default it checks the path before the evaluation, and
+part of what it checks is that the test tree does not exist yet. After the
+eighteen runs, `--post-run` keeps every one of those checks except that one and
+adds step 5 of Part 12: the access log, the eighteen artifact sets and their
+recorded identities, read for counts and identities and never for a
+measurement. The post-run checks are committed before the sequence runs, so
+the rule they apply is fixed with no test number in view.
 
 Two things make that a guarantee rather than an intention. `GTSRB.__getitem__`
 is replaced for the duration of the run by a tripwire that raises, so any code
@@ -31,6 +39,7 @@ import io
 import json
 import os
 import re
+import sys
 import tempfile
 import time
 from datetime import datetime
@@ -89,6 +98,7 @@ from .evaluate_robustness import (
     independent_metrics,
 )
 from .evaluate_test import (
+    ACCESS_LOG,
     EXPECTED_TEST_SIZE,
     GROUND_TRUTH_FIELDS,
     INVENTORY_PATH,
@@ -598,9 +608,24 @@ def check_class_support():
             assert "sum to" in str(error), error
         else:
             raise AssertionError("a label array of the wrong length was accepted")
+    # Part 3 leaves the number of classes present in the test labels to a
+    # check that counts distinct ids. A missing class is the case bincount
+    # cannot see, because padding reports it as a support of zero.
+    missing = np.where(labels == NUM_CLASSES - 1, 0, labels)
+    assert len(missing) == EXPECTED_TEST_SIZE
+    try:
+        class_support(missing)
+    except RuntimeError as error:
+        assert "distinct class" in str(error), error
+    else:
+        raise AssertionError("labels missing a class were accepted, so a "
+                             "class with no test images would be averaged "
+                             "into macro F1 as a zero")
     print(f"  class support covers all {NUM_CLASSES} classes and sums to "
-          f"{EXPECTED_TEST_SIZE}; a label array of any other length is refused")
-    return 5
+          f"{EXPECTED_TEST_SIZE}; a label array of any other length is "
+          "refused, and so is one of the right length that never names a "
+          "class")
+    return 7
 
 
 def check_output_safety(directory):
@@ -803,13 +828,18 @@ def check_access_log(directory):
     assert len(log.read_text().splitlines()) == 3
     assert log.read_text().startswith(second)
 
-    # The frozen verification: 18 completed lines, no repeated triple.
+    # The shape the frozen verification reads: one line per attempt, with the
+    # arm, seed and suite triple identifying it. That eighteen completed lines
+    # carry eighteen distinct triples is a property of the real log and is
+    # asserted by check_run_record, not here - this fixture only shows that
+    # the triple is recorded and recoverable per line.
     triples = {(line["arm"], line["seed"], line["suite"])
                for line in [json.loads(value)
                             for value in log.read_text().splitlines()]}
     assert len(triples) == 3
-    print("  the arm, seed and suite triple of each line is distinct, which is "
-          "the uniqueness the 18-run verification checks")
+    print("  each line carries the arm, seed and suite triple the post-run "
+          "verification identifies a run by, and the three written here are "
+          "distinct")
     return 24
 
 
@@ -1907,7 +1937,8 @@ def check_snapshot_mechanism(directory, record_to=None):
     result = verify_artifact_snapshot(snapshot)
     assert not result["changed"] and not result["missing"], result
     print("  re-verifying it immediately reports nothing changed and nothing "
-          "missing, which is the comparison step 5 of Part 12 runs")
+          "missing, which is the comparison --verify-snapshot runs against "
+          "the file step 1 recorded")
 
     # A tamper test on copies, so no committed artifact is touched.
     copied = directory / "copy"
@@ -1957,6 +1988,13 @@ def check_snapshot_mechanism(directory, record_to=None):
 # against the captured output of a complete synthetic run.
 METRIC_TOKENS = ("accuracy", "macro_f1", "macro F1", "error_rate", "f1_score",
                  "loss", "_drop", "recall", "precision")
+
+# Names whose value is a performance level rather than a count or an identity.
+# A raise may report the size of a disagreement between two of them; it may not
+# report either one.
+METRIC_VALUE_NAMES = ("accuracy", "macro_f1", "_f1", "loss", "through_matrix",
+                      "direct", "swept", "referenced", "error_rate", "drop",
+                      "recall", "precision")
 
 # Names whose indexed assignment is the module's own bookkeeping. Anything
 # else assigned by index or by attribute inside the evaluator would be a
@@ -2008,6 +2046,58 @@ def check_metric_suppression():
     print(f"  {checks} print statements across the evaluator and the "
           "eighteen-run wrapper, and not one of them can render an accuracy, "
           "a macro F1, an error rate, a loss or a drop")
+
+    # A raise is the other way a measurement could reach the terminal, and
+    # three of them do compare a metric against its own independent count.
+    # Each reports how far apart the two are and the tolerance that separation
+    # exceeded, never either metric, so a failed run says the metric path is
+    # wrong without saying what it measured - and a failed run is not a result
+    # in any case.
+    disagreements = 0
+    for module in (evaluate_test.__file__, run_final_test.__file__):
+        for node in ast.walk(ast.parse(Path(module).read_text())):
+            if not isinstance(node, ast.Raise):
+                continue
+            # A message assembled under a name somewhere else would carry
+            # whatever that name held past this scan, so every raise builds
+            # its message where it raises it.
+            if isinstance(node.exc, ast.Call):
+                for argument in node.exc.args:
+                    assert not isinstance(argument, (ast.Name, ast.Attribute,
+                                                     ast.Subscript)), \
+                        (f"{Path(module).name}:{node.lineno} raises a message "
+                         f"built elsewhere: {ast.unparse(argument)}")
+                    checks += 1
+            for inner in ast.walk(node):
+                if not isinstance(inner, ast.FormattedValue):
+                    continue
+                source = ast.unparse(inner.value)
+                if not any(name in source for name in METRIC_VALUE_NAMES):
+                    continue
+                # Only a distance between two readings of the same metric is
+                # allowed, so both sides have to be a reading: abs(x - 0)
+                # would otherwise report the metric itself.
+                call = inner.value
+                assert (isinstance(call, ast.Call)
+                        and ast.unparse(call.func) == "abs"
+                        and len(call.args) == 1
+                        and isinstance(call.args[0], ast.BinOp)
+                        and isinstance(call.args[0].op, ast.Sub)), \
+                    f"{Path(module).name}:{inner.lineno} raises on {source}"
+                for side in (call.args[0].left, call.args[0].right):
+                    assert any(name in ast.unparse(side)
+                               for name in METRIC_VALUE_NAMES), \
+                        (f"{Path(module).name}:{inner.lineno} subtracts "
+                         f"{ast.unparse(side)} from a measurement")
+                disagreements += 1
+                checks += 3
+    assert disagreements == 3, disagreements
+    print(f"  the {disagreements} raises that mention a measurement at all "
+          "interpolate the distance between two readings of it and nothing "
+          "else, both sides of every difference being a reading of the same "
+          "metric: no raise in either module can report a metric's value, and "
+          "none of them builds its message out of sight")
+    checks += 1
 
     signature = inspect.signature(evaluate_test.condition_progress)
     assert list(signature.parameters) == [
@@ -2272,7 +2362,7 @@ def run_stubbed_evaluation(workspace, name, failure=None,
     return outcome
 
 
-def check_failure_handling(workspace):
+def check_failure_handling(workspace, results_exist=False):
     """A run that completes, a run that is refused, and six that break.
 
     All seven go through `evaluate_test.main` itself, on a synthetic split of
@@ -2422,14 +2512,14 @@ def check_failure_handling(workspace):
     assert evaluate_test.evaluate_condition is evaluate_condition
     assert evaluate_test.append_access_log is append_access_log
     assert evaluate_test.np is np
-    assert not TEST_RESULTS_ROOT.exists()
+    assert TEST_RESULTS_ROOT.exists() == results_exist
     print("  the module's real split size, read budget, access-log path, "
           "inference function, log writer and numpy binding are all back, and "
-          f"{evaluate_test._repository_path(TEST_RESULTS_ROOT)} was never "
-          "created")
+          f"{evaluate_test._repository_path(TEST_RESULTS_ROOT)} is as it was "
+          "before these tests ran")
     return checks + 7
 
-def check_execution_plan(workspace):
+def check_execution_plan(workspace, results_exist=False):
     """The eighteen commands, field by field, against the inventory itself."""
     inventory = json.loads(INVENTORY_PATH.read_text())["models"]
     expected = []
@@ -2460,6 +2550,8 @@ def check_execution_plan(workspace):
         assert run["output_dir"] == results_dir(arm, seed, suite)
         assert TEST_RESULTS_ROOT in Path(run["output_dir"]).parents
         assert file_md5(Path(checkpoint)) == digest, checkpoint
+        assert evaluate_test.file_sha256(Path(checkpoint)) == \
+            run["checkpoint_sha256"], checkpoint
         arguments = evaluate_test.parse_arguments(command[3:])
         assert arguments.checkpoint == checkpoint
         assert arguments.suite == suite
@@ -2468,18 +2560,30 @@ def check_execution_plan(workspace):
         assert not arguments.smoke_test
         assert results_dir(arguments.model_name, seed, arguments.suite,
                            arguments.output_dir) == Path(run["output_dir"])
-        checks += 8
+        checks += 9
     print(f"  {len(runs)} commands in the inventory's own row order, frozen "
           "suite before held-out: every checkpoint path, arm label, seed, "
           "suite, device and worker count equals the inventory's, every "
-          "checkpoint md5 was recomputed and matched, and the evaluator's own "
-          "parser turns each command into the directory its row names")
+          "checkpoint md5 and sha256 was recomputed and matched, and the "
+          "evaluator's own parser turns each command into the directory its "
+          "row names")
 
-    summary = run_final_test.check_plan(runs, verify_digests=False)
+    done = ([run["position"] for run in runs] if results_exist else [])
+    summary = run_final_test.check_plan(runs, verify_digests=False, done=done)
     assert summary == {"runs": 18, "models": 9,
                        "suites": ["frozen", "heldout"], "device": "cpu",
-                       "digests_verified": False}, summary
+                       "digests_verified": False,
+                       "already_completed": len(done)}, summary
     checks += 1
+
+    # Every fixture below but the occupied one is planned under its own empty
+    # root. Against the real targets each row would trip the occupied-target
+    # guard first once the sequence has written its results, so the section
+    # would pass before the sweep and fail after it on an error that has
+    # nothing to do with the damage it is testing.
+    def intact(device="cpu"):
+        return run_final_test.plan_runs(device, workspace / "damage",
+                                        workspace / "damage_logs")
 
     occupied = workspace / "occupied"
     planned = run_final_test.plan_runs("cpu", occupied, workspace / "logs")
@@ -2491,37 +2595,52 @@ def check_execution_plan(workspace):
          "already holds results"),
     ]
     for arm_label in ("targeted",):
-        wrong_arm = run_final_test.plan_runs("cpu")
+        wrong_arm = intact()
         wrong_arm[0]["arm_label"] = arm_label
         damage.append(("an arm label that would misfile a result", wrong_arm,
                        "would file"))
-    wrong_checkpoint = run_final_test.plan_runs("cpu")
+    wrong_checkpoint = intact()
     wrong_checkpoint[2]["checkpoint"] = "artifacts/clean_seed44/best_checkpoint.pt"
     damage.append(("a checkpoint that is not the model's own",
                    wrong_checkpoint, "would read"))
-    repeated = run_final_test.plan_runs("cpu")
+    wrong_digest = intact()
+    wrong_digest[8]["checkpoint_sha256"] = "0" * 64
+    damage.append(("a row carrying a sha256 the inventory does not record",
+                   wrong_digest, "does not record"))
+    repeated = intact()
     repeated[3] = dict(repeated[2])
     damage.append(("the same model and suite planned twice", repeated,
                    "planned twice"))
-    workers = run_final_test.plan_runs("cpu")
+    workers = intact()
     workers[0]["num_workers"] = 2
     damage.append(("a worker count above zero", workers, "read accounting"))
-    devices = run_final_test.plan_runs("cpu")
-    devices[9] = run_final_test.plan_runs("mps")[9]
+    devices = intact()
+    devices[9] = intact("mps")[9]
     damage.append(("two devices in one sequence", devices, "devices"))
-    mismatched = run_final_test.plan_runs("cpu")
-    mismatched[0]["command"] = mismatched[0]["command"] + [
-        "--output-dir", str(mismatched[0]["output_dir"])]
-    damage.append(("a command that would write somewhere other than the "
-                   "directory its row names", mismatched, "would write"))
-    short = run_final_test.plan_runs("cpu")[:17]
+    nested = intact()
+    nested[0]["command"] = nested[0]["command"] + [
+        "--output-dir", str(nested[0]["output_dir"])]
+    damage.append(("a command passing a target directory as the output root",
+                   nested, "already ends in"))
+    moved = intact()
+    moved[6]["output_dir"] = Path(moved[6]["output_dir"]).parent / "elsewhere"
+    damage.append(("a row naming a directory its own command would not "
+                   "produce", moved, "and the plan says"))
+    smoke = intact()
+    smoke[4]["command"] = smoke[4]["command"] + ["--smoke-test"]
+    damage.append(("a command that would run the smoke path instead of the "
+                   "sweep", smoke, "does not say what the plan's row says"))
+    short = intact()[:17]
     damage.append(("a sequence of the wrong length", short, "expected 18"))
-    missing = run_final_test.plan_runs("cpu")
+    missing = intact()
     missing[5]["model"] = "A45"
     damage.append(("a model outside the inventory", missing,
                    "not in the checkpoint inventory"))
 
     for label, plan, message in damage:
+        for row in plan:
+            assert TEST_RESULTS_ROOT not in Path(row["output_dir"]).parents, \
+                label
         try:
             run_final_test.check_plan(plan, verify_digests=False)
         except RuntimeError as error:
@@ -2533,19 +2652,32 @@ def check_execution_plan(workspace):
           + "; ".join(label for label, _, _ in damage))
 
     console = io.StringIO()
+    argv = ["--device", "cpu", "--skip-digests"]
+    if results_exist:
+        # The real targets are occupied once the sequence has run, which the
+        # plan check refuses by design; --resume is the invocation that is
+        # meant to be possible then, and without --execute it still runs
+        # nothing.
+        argv.append("--resume")
+    listings = {path: sorted(entry.name for entry in path.iterdir())
+                if path.exists() else None
+                for path in (run_final_test.LOG_DIR, TEST_RESULTS_ROOT)}
     with contextlib.redirect_stdout(console):
-        code = run_final_test.main(["--device", "cpu", "--skip-digests"])
+        code = run_final_test.main(argv)
     assert code == 0
     text = console.getvalue()
     assert "Plan only" in text and "18 runs" in text
     assert text.count("--checkpoint") == 18
     for token in METRIC_TOKENS:
         assert token not in text, f"the plan mentions {token}"
-    assert not run_final_test.LOG_DIR.exists()
-    assert not TEST_RESULTS_ROOT.exists()
-    print("  the default invocation prints the plan, validates it, creates "
-          "neither the results root nor the log directory, and carries no "
-          "measurement; --execute is what runs anything")
+    for path, before in listings.items():
+        after = sorted(entry.name for entry in path.iterdir()) \
+            if path.exists() else None
+        assert after == before, path
+        assert results_exist or before is None, path
+    print("  the invocation without --execute prints the plan, validates it, "
+          "leaves the results root and the log directory exactly as it found "
+          "them, and carries no measurement; --execute is what runs anything")
     checks += 7
 
     # A failure stops the sequence where it happened.
@@ -2596,15 +2728,391 @@ def check_execution_plan(workspace):
           "with the earlier runs kept and nothing attempted after it, and a "
           "run that exits zero without appending a completed line stops it "
           "too rather than being counted")
-    return checks + 7
+    checks += 7
+
+    # A resumed sequence skips a pair only when every record agrees, so the
+    # fixtures below give it one record without the other in both directions
+    # and then each way the two can disagree.
+    def place(run, marker=False, drop=(), metadata=None):
+        target = Path(run["output_dir"])
+        target.mkdir(parents=True, exist_ok=True)
+        record = {
+            "model": {"name": run["arm_label"], "seed": run["seed"],
+                      "arm": run["arm"]},
+            "checkpoint_digests": {"md5": run["checkpoint_md5"],
+                                   "sha256": run["checkpoint_sha256"]},
+            "evaluation": {"suite": run["suite"], "split": "official_test"},
+        }
+        for key, value in (metadata or {}).items():
+            record[key[0]][key[1]] = value
+        for name in evaluate_test.RESULT_FILES:
+            if name in drop:
+                continue
+            if name == "metadata.json":
+                (target / name).write_text(json.dumps(record))
+            else:
+                (target / name).write_text("placed\n")
+        if marker:
+            (target / evaluate_test.INCOMPLETE_MARKER).write_text("placed\n")
+
+    def logged(runs, status="completed", **override):
+        text = ""
+        for run in runs:
+            entry = access_log_entry(
+                status, arm=run["arm_label"], seed=run["seed"],
+                suite=run["suite"], checkpoint_md5=run["checkpoint_md5"],
+                output_dir=evaluate_test._repository_path(run["output_dir"]))
+            entry.update(override)
+            text += json.dumps(entry) + "\n"
+        return text
+
+    resumed = run_final_test.plan_runs("cpu", workspace / "resumed",
+                                       workspace / "resumed_logs")
+    log = workspace / "resumed_access_log.jsonl"
+    assert run_final_test.completed_runs(resumed, log) == []
+    place(resumed[0])
+    place(resumed[1])
+    log.write_text(logged(resumed[:2]))
+    finished = [run["position"] for run in resumed[:2]]
+    assert run_final_test.completed_runs(resumed, log) == finished
+
+    log.write_text(logged(resumed[:1]))
+    assert run_final_test.completed_runs(resumed, log) == finished[:1]
+    log.write_text(logged(resumed[:1], "failed"))
+    assert run_final_test.completed_runs(resumed, log) == []
+    log.write_text(logged(resumed[:1]) + logged(resumed[:1]))
+    try:
+        run_final_test.completed_runs(resumed, log)
+    except RuntimeError as error:
+        assert "completed 2 times" in str(error), error
+    else:
+        raise AssertionError("a pair recorded as completed twice was "
+                             "resumed over rather than raised")
+    checks += 5
+
+    # Each of these breaks exactly one of the records a skip depends on.
+    disagreements = [
+        ("an artifact set missing one file", {},
+         {"drop": (evaluate_test.RESULT_FILES[0],)},
+         evaluate_test.RESULT_FILES[0]),
+        ("a complete set still carrying the partial-write marker", {},
+         {"marker": True}, evaluate_test.INCOMPLETE_MARKER),
+        ("a logged line naming another checkpoint",
+         {"checkpoint_md5": "0" * 32}, {}, "checkpoint md5"),
+        ("a logged line naming another directory",
+         {"output_dir": "artifacts/final_test/elsewhere"}, {},
+         "output directory"),
+        ("a result set whose metadata names another arm", {},
+         {"metadata": {("model", "name"): "targeted"}}, "arm"),
+        ("a result set whose metadata names another seed", {},
+         {"metadata": {("model", "seed"): 99}}, "seed"),
+        ("a result set whose metadata names another suite", {},
+         {"metadata": {("evaluation", "suite"): "heldout"}}, "suite"),
+        ("a result set written from another checkpoint", {},
+         {"metadata": {("checkpoint_digests", "sha256"): "0" * 64}},
+         "checkpoint sha256"),
+        ("a result set for a different split", {},
+         {"metadata": {("evaluation", "split"): "validation"}},
+         "not the official test split"),
+    ]
+    for index, (label, override, placement, keyword) in \
+            enumerate(disagreements):
+        broken = run_final_test.plan_runs("cpu", workspace / f"half{index}",
+                                          workspace / "resumed_logs")
+        place(broken[0], **placement)
+        log.write_text(logged(broken[:1], **override))
+        try:
+            run_final_test.completed_runs(broken, log)
+        except RuntimeError as error:
+            assert "resolve that by hand" in str(error), (label, error)
+            assert keyword in str(error), (label, error)
+            for token in METRIC_TOKENS:
+                assert token not in str(error), (label, token)
+        else:
+            raise AssertionError(f"a resumed sequence would have skipped "
+                                 f"{label}")
+        checks += 1
+
+    # A retried pair keeps the log of the attempt it retried.
+    attempt = {"log": workspace / "retried" / "clean_seed42_frozen.log",
+               "command": [sys.executable, "-c", "print('first attempt')"]}
+    assert run_final_test.run_one(attempt)["returncode"] == 0
+    attempt["command"] = [sys.executable, "-c", "print('second attempt')"]
+    assert run_final_test.run_one(attempt)["returncode"] == 0
+    kept = attempt["log"].read_text()
+    assert "first attempt" in kept and "second attempt" in kept, kept
+    stamped = [line for line in kept.splitlines()
+               if re.match(r"^\d{4}-\d\d-\d\dT\S+ ", line)]
+    assert len(stamped) == 2, stamped
+    print("  a retried run appends to its log behind its own timestamped "
+          "command header, so the output of the attempt it retried is still "
+          "there afterwards")
+    checks += 4
+
+    log.write_text(logged(resumed[:2]))
+    try:
+        run_final_test.check_plan(resumed, verify_digests=False)
+    except RuntimeError as error:
+        assert "already holds results" in str(error), error
+    else:
+        raise AssertionError("the plan check accepted occupied targets "
+                             "without being told they were finished")
+    run_final_test.check_plan(
+        resumed, verify_digests=False,
+        done=run_final_test.completed_runs(resumed, log))
+    print(f"  a resumed sequence skips a pair only when the access log's one "
+          f"completed line, the whole artifact set with no partial-write "
+          f"marker, and the result set's own metadata all agree with the "
+          f"plan's row on the checkpoint, the arm, the seed, the suite and "
+          f"the directory: all {len(disagreements)} ways one of those records "
+          "can break stop it for the operator instead, a pair logged twice "
+          "stops it, an artifact set with no logged read is not skipped, a "
+          "failed line is not a completed one, and the occupied targets the "
+          "plan check refuses outright are the ones --resume is required to "
+          "pass")
+    return checks + 3
+
+
+def check_recorded_snapshot(path):
+    """The pre-run snapshot of Part 12 step 1, re-verified as step 5 requires.
+
+    `check_snapshot_mechanism` takes a snapshot and re-verifies it in the same
+    process, which shows the comparison works but cannot show that nothing
+    moved: the only snapshot that can is the one recorded before the sequence
+    ran. This loads that file and compares it against the tree as it now
+    stands, so the checkpoints measured and the validation results they are
+    compared against are established to be the same bytes, in the same file
+    modes, as before the first run.
+    """
+    target = Path(path)
+    if not target.is_file():
+        raise RuntimeError(
+            f"{target} does not hold a pre-run snapshot. Step 5 of Part 12 "
+            "re-verifies the one step 1 recorded with --record-snapshot; "
+            "without it the comparison has nothing to compare against.")
+    snapshot = json.loads(target.read_text())
+    for key in ("files", "checkpoints", "trees"):
+        if key not in snapshot:
+            raise RuntimeError(f"{target} has no {key!r} section, so it is "
+                               "not a snapshot this module wrote")
+    if len(snapshot["checkpoints"]) != 9:
+        raise RuntimeError(f"{target} covers "
+                           f"{len(snapshot['checkpoints'])} checkpoints, "
+                           "not the nine the inventory approves")
+    result = verify_artifact_snapshot(snapshot)
+    assert not result["changed"], result["changed"]
+    assert not result["missing"], result["missing"]
+    print(f"  {result['files']} committed artifacts and "
+          f"{result['checkpoints']} checkpoints are byte-identical to "
+          f"{evaluate_test._repository_path(target)}, recorded before the "
+          "sequence ran, and the checkpoints carry the same file modes")
+    print(f"  the snapshot covers {', '.join(snapshot['trees'])}, so the "
+          "validation results the test results will be compared against are "
+          "the ones the sweep started from")
+    return 4
+
+
+def check_run_record():
+    """Step 5 of Part 12, over the record the eighteen runs leave behind.
+
+    Committed before the sequence runs, so the rule every line and every
+    directory is held to was fixed with no test number in view. It reads the
+    access log, the artifact file names and the metadata identities, and opens
+    no summary, no prediction file and no confusion matrix, so not one
+    measurement passes through it.
+
+    The frozen Part 9 verification says the log holds exactly eighteen lines
+    and that any extra line is a repeated evaluation. The implementation
+    records a `failed` line for every unsuccessful attempt, which the frozen
+    document's schema does not describe, so the rule applied here is the
+    amended one recorded in docs/final_test_deviations.md: exactly eighteen
+    `completed` lines with no repeated triple, and any number of `failed`
+    lines, each for a planned pair and each paired with a stopped run.
+    """
+    if not ACCESS_LOG.exists():
+        raise RuntimeError(
+            f"{evaluate_test._repository_path(ACCESS_LOG)} does not exist; "
+            "there is no run record to verify")
+    entries = [json.loads(line) for line in ACCESS_LOG.read_text().splitlines()
+               if line.strip()]
+    completed = [entry for entry in entries
+                 if entry.get("status") == "completed"]
+    attempts = [entry for entry in entries
+                if entry.get("status") != "completed"]
+    runs = {(run["arm_label"], run["seed"], run["suite"]): run
+            for run in run_final_test.plan_runs("mps")}
+    assert len(runs) == 18, len(runs)
+
+    triples = [(entry["arm"], entry["seed"], entry["suite"])
+               for entry in completed]
+    assert len(triples) == 18, f"{len(triples)} completed lines, expected 18"
+    assert len(set(triples)) == 18, f"a completed triple is repeated: {triples}"
+    assert set(triples) == set(runs), sorted(set(triples) ^ set(runs))
+    checks = 4
+
+    records = {(model["arm_label"], int(model["seed"])): model
+               for model in run_final_test.inventory_models()}
+    for entry in completed:
+        triple = (entry["arm"], entry["seed"], entry["suite"])
+        run = runs[triple]
+        record = records[(entry["arm"], entry["seed"])]
+        suite = TEST_SUITES[entry["suite"]]
+        assert entry["module"] == "src/evaluate_test.py", triple
+        assert entry["checkpoint_md5"] == record["checkpoint_md5"], triple
+        assert entry["conditions"] == len(suite.conditions()), triple
+        assert entry["test_images_read"] == \
+            PROTOCOL_READ_COUNTS[entry["suite"]], (triple,
+                                                   entry["test_images_read"])
+        assert entry["test_loader_iterations"] == 1, triple
+        assert entry["test_loader_reads"] == EXPECTED_TEST_SIZE, triple
+        for field in ("train_loader_iterations", "train_loader_reads",
+                      "validation_loader_iterations",
+                      "validation_loader_reads"):
+            assert entry[field] == 0, (triple, field)
+        assert entry["output_dir"] == \
+            evaluate_test._repository_path(run["output_dir"]), triple
+        checks += 8
+
+        target = Path(run["output_dir"])
+        present = sorted(path.name for path in target.iterdir())
+        assert present == sorted(evaluate_test.RESULT_FILES), (triple, present)
+        assert evaluate_test.INCOMPLETE_MARKER not in present, triple
+        # The condition count the line and the metadata state is the run's
+        # own report of itself. The names in the confusion archive are the
+        # conditions that actually have a matrix, and the zip directory gives
+        # them without any array being read, so the completeness of the
+        # condition set is established from the artifacts rather than taken
+        # on the run's word.
+        with np.load(target / "confusion_matrices.npz") as archive:
+            stored = sorted(archive.files)
+        assert stored == sorted(f"{corruption}_s{severity}" for
+                                corruption, severity in suite.conditions()), \
+            (triple, len(stored))
+        metadata = json.loads((target / "metadata.json").read_text())
+        assert metadata["evaluation"]["split"] == "official_test", triple
+        assert metadata["corruption_suite"]["namespace"] == TEST_NAMESPACE
+        assert metadata["evaluation"]["suite"] == entry["suite"], triple
+        assert metadata["evaluation"]["conditions"] == entry["conditions"]
+        assert metadata["evaluation"]["num_workers"] == 0, triple
+        assert metadata["evaluation"]["gradients_enabled"] is False, triple
+        assert metadata["evaluation"]["test_images"] == EXPECTED_TEST_SIZE
+        assert metadata["model"]["name"] == entry["arm"], triple
+        assert metadata["model"]["seed"] == entry["seed"], triple
+        assert metadata["checkpoint_digests"]["md5"] == \
+            record["checkpoint_md5"], triple
+        assert metadata["checkpoint_digests"]["sha256"] == \
+            record["checkpoint_sha256"], triple
+        assert metadata["inventory_record"]["selected_epoch"] == \
+            int(record["selected_epoch"]), triple
+        checks += 14
+
+    for entry in attempts:
+        triple = (entry.get("arm"), entry.get("seed"), entry.get("suite"))
+        assert entry.get("status") == "failed", entry
+        if triple in runs:
+            pass
+        elif entry.get("arm") is None and entry.get("seed") is None:
+            # A run that stopped before the inventory named its pair has not
+            # read a test image yet, so the line records the attempt without
+            # being attributable to one of the eighteen. The amended rule in
+            # docs/final_test_deviations.md admits it only on that condition.
+            assert entry.get("test_images_read") == 0, entry
+        else:
+            raise AssertionError(f"a failed line names an unplanned run: "
+                                 f"{triple}")
+        checks += 2
+
+    # Nothing else is in the tree: a nineteenth result set, or a partial one
+    # moved aside within the tree rather than out of it, would otherwise sit
+    # beside the eighteen unnoticed and could be read as a result.
+    expected_tree = sorted({f"{run['arm_label']}_seed{run['seed']}"
+                            for run in runs.values()}
+                           | {"logs", ACCESS_LOG.name})
+    assert sorted(path.name for path in
+                  TEST_RESULTS_ROOT.iterdir()) == expected_tree, \
+        sorted(path.name for path in TEST_RESULTS_ROOT.iterdir())
+    for name in expected_tree:
+        if name in ("logs", ACCESS_LOG.name):
+            continue
+        assert sorted(path.name for path in
+                      (TEST_RESULTS_ROOT / name).iterdir()) == \
+            ["frozen", "heldout"], name
+    checks += 10
+
+    # Part 12 step 4 keeps one log per run, and a retry must not erase the
+    # attempt it retried: each pair's log carries at least one header per line
+    # the access log records for that pair, so a second attempt added a header
+    # rather than replacing the first one's output.
+    header = re.compile(r"^\d{4}-\d\d-\d\dT\S+ .* -m src\.evaluate_test ")
+    for triple, run in runs.items():
+        log = Path(run["log"])
+        assert log.is_file(), f"no log for {triple}"
+        headers = [line for line in log.read_text().splitlines()
+                   if header.match(line)]
+        recorded = sum(1 for entry in entries
+                       if (entry.get("arm"), entry.get("seed"),
+                           entry.get("suite")) == triple)
+        assert len(headers) >= recorded, (triple, len(headers), recorded)
+        checks += 2
+
+    # The nine checkpoints are the same bytes after the sweep as before it.
+    plan = list(runs.values())
+    summary = run_final_test.check_plan(
+        plan, verify_digests=True,
+        done=[run["position"] for run in plan])
+    assert summary["runs"] == 18 and summary["digests_verified"]
+    assert summary["already_completed"] == 18
+    checks += 2
+
+    print(f"  18 completed lines, one per planned pair with no triple "
+          f"repeated, each recording {EXPECTED_TEST_SIZE} loader reads, one "
+          "loader iteration, the budget Part 9 states for its suite, and zero "
+          "train and validation reads")
+    print(f"  each result set's confusion archive names exactly its suite's "
+          f"conditions - {len(TEST_SUITES['frozen'].conditions())} frozen and "
+          f"{len(TEST_SUITES['heldout'].conditions())} held-out - read from "
+          "the archive directory, so a short condition set cannot pass as a "
+          "complete one; no matrix was loaded")
+    print(f"  the nine arm directories, {ACCESS_LOG.name} and logs/ are the "
+          "only entries in the results root, and each arm directory holds "
+          "exactly its frozen and held-out result sets, so nothing else in "
+          "the tree can be read as a result")
+    print("  18 directories holding the complete artifact set and no "
+          "partial-write marker, each one's metadata naming the official test "
+          "split, the final_test namespace, its own arm, seed and selected "
+          "epoch, both inventory digests, 0 workers and no gradients")
+    print(f"  {len(attempts)} failed attempt(s) in the log, each for a planned "
+          "pair, preserved rather than deleted and not counted as a result")
+    print("  18 per-run logs, each carrying at least one timestamped command "
+          "header for every line the access log records for its pair, so a "
+          "retry appended its attempt rather than overwriting the one it "
+          "retried")
+    print("  the nine checkpoints still match both digests the inventory "
+          "records, so the files measured are the files the validation "
+          "results were measured from")
+    print("  no summary, prediction file or confusion matrix was opened here: "
+          "this check reads identities and counts, and the measurements stay "
+          "unread until it has passed")
+    return checks
 
 
 def parse_arguments(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--record-snapshot", default=None, metavar="PATH",
                         help="write the pre-run artifact and checkpoint digest "
-                             "snapshot that Part 12 step 1 records and step 5 "
-                             "re-verifies; refuses an existing file")
+                             "snapshot that Part 12 step 1 records; step 5 "
+                             "re-verifies it with --verify-snapshot. Refuses "
+                             "an existing file")
+    parser.add_argument("--verify-snapshot", default=None, metavar="PATH",
+                        help="re-verify a snapshot written by "
+                             "--record-snapshot; required with --post-run, "
+                             "which is step 5 of Part 12")
+    parser.add_argument("--post-run", action="store_true",
+                        help="also verify the record the eighteen runs left: "
+                             "the access log, the artifact sets and their "
+                             "identities. Required once the sequence has run, "
+                             "because the checks that the test tree does not "
+                             "exist are true only before it")
     return parser.parse_args(argv)
 
 
@@ -2653,10 +3161,28 @@ def main(argv=None):
             ("What the console says while a sweep runs",
              check_metric_suppression),
             ("Failure handling, through the evaluator itself",
-             lambda: check_failure_handling(workspace / "failures")),
+             lambda: check_failure_handling(workspace / "failures",
+                                            arguments.post_run)),
             ("The eighteen-run execution plan",
-             lambda: check_execution_plan(workspace / "plan")),
+             lambda: check_execution_plan(workspace / "plan",
+                                          arguments.post_run)),
         ]
+        if arguments.post_run:
+            if not arguments.verify_snapshot:
+                raise SystemExit(
+                    "--post-run is step 5 of Part 12, which re-verifies the "
+                    "snapshot step 1 recorded. Pass --verify-snapshot PATH "
+                    "with the file --record-snapshot wrote before the "
+                    "sequence ran.")
+            sections.append(
+                ("The pre-run snapshot, re-verified",
+                 lambda: check_recorded_snapshot(arguments.verify_snapshot)))
+            sections.append(("The record the eighteen runs left",
+                             check_run_record))
+        elif arguments.verify_snapshot:
+            sections.append(
+                ("The recorded snapshot, re-verified",
+                 lambda: check_recorded_snapshot(arguments.verify_snapshot)))
         for title, check in sections:
             print(f"\n{title}:")
             total += check()
@@ -2681,17 +3207,32 @@ def main(argv=None):
 
         assert tripwire.calls == 0
 
-    assert not TEST_RESULTS_ROOT.exists(), \
-        f"{TEST_RESULTS_ROOT} exists; this module must not create it"
+    if arguments.post_run:
+        assert TEST_RESULTS_ROOT.exists(), \
+            f"{TEST_RESULTS_ROOT} does not exist; --post-run has nothing to "\
+            "verify and the sequence has not run"
+    else:
+        assert not TEST_RESULTS_ROOT.exists(), \
+            f"{TEST_RESULTS_ROOT} exists; the sequence has run, so this "\
+            "module must be run with --post-run"
+    # True in both modes: step 7 writes the comparison, and it runs after the
+    # step 5 verification this module performs, so the directory must not
+    # exist when either mode finishes.
     assert not compare_test.ANALYSIS_DIR.exists(), \
-        f"{compare_test.ANALYSIS_DIR} exists; this module must not create it"
+        f"{compare_test.ANALYSIS_DIR} exists; this module must not create it, " \
+        "and step 7 has not been reached"
 
     print(f"\nAll {total} checks passed in {time.time() - started:.1f}s. No "
           "official test image was decoded, no official test loader was "
-          "iterated, no checkpoint was loaded, no test metric was computed, "
-          f"and neither {evaluate_test._repository_path(TEST_RESULTS_ROOT)} nor "
-          f"{evaluate_test._repository_path(compare_test.ANALYSIS_DIR)} was "
-          "created.")
+          "iterated, no checkpoint was loaded and no test metric was "
+          "computed.")
+    if arguments.post_run:
+        print("The eighteen result sets this verified were written by the "
+              "sequence, not here, and none of their measurements was read.")
+    else:
+        print(f"Neither {evaluate_test._repository_path(TEST_RESULTS_ROOT)} "
+              f"nor {evaluate_test._repository_path(compare_test.ANALYSIS_DIR)}"
+              " was created.")
 
 
 if __name__ == "__main__":

@@ -474,11 +474,22 @@ def class_support(labels):
     counts = np.bincount(np.asarray(labels, dtype=np.int64),
                          minlength=NUM_CLASSES)
     if counts.size != NUM_CLASSES:
-        raise RuntimeError(f"test labels cover {counts.size} classes, expected "
-                           f"{NUM_CLASSES}")
+        raise RuntimeError(f"test labels run to class id {counts.size - 1}, "
+                           f"outside the {NUM_CLASSES} classes the benchmark "
+                           "defines")
     if int(counts.sum()) != EXPECTED_TEST_SIZE:
         raise RuntimeError(f"class supports sum to {int(counts.sum())}, "
                            f"expected {EXPECTED_TEST_SIZE}")
+    # Part 3 leaves the number of classes actually present in the test labels
+    # to a check that counts distinct ids and nothing else. bincount's own size
+    # cannot do it: padded to NUM_CLASSES, it reports a missing class as a zero
+    # count, and a class with no test images would contribute a 0 to macro F1
+    # under the policy train.metrics_from_confusion documents.
+    present = len(set(int(label) for label in np.asarray(labels)))
+    if present != NUM_CLASSES:
+        raise RuntimeError(f"the test labels carry {present} distinct class "
+                           f"ids, not {NUM_CLASSES}; a class with no test "
+                           "images would be averaged in as a zero")
     return {str(class_id): int(counts[class_id]) for class_id in range(NUM_CLASSES)}
 
 
@@ -831,6 +842,12 @@ def evaluate(arguments, counters):
     print("\nCheckpoint:")
     record = inventory_record(arguments.checkpoint)
     digests = check_inventory_digests(arguments.checkpoint, record)
+    # The pair this run belongs to is known as soon as the inventory names it,
+    # and a failure from here on has to be filed against that pair: a failed
+    # line that names no pair cannot be matched to a planned run, and the log
+    # is append-only, so one would have to be reasoned about by hand forever.
+    counters.update({"arm": record["arm_label"], "seed": int(record["seed"]),
+                     "checkpoint_md5": digests["md5"], "suite": suite.name})
     model, checkpoint, identity = check_identity(arguments.checkpoint, device)
     run_metadata = discover_run_metadata(arguments.checkpoint)
     model_name = resolve_model_name(run_metadata, arguments.model_name)
@@ -850,8 +867,6 @@ def evaluate(arguments, counters):
         raise RuntimeError(
             f"this checkpoint is epoch {identity['epoch']} but the inventory "
             f"records the selected epoch as {record['selected_epoch']}")
-    counters.update({"arm": model_name, "seed": seed,
-                     "checkpoint_md5": digests["md5"], "suite": suite.name})
     print(f"  {identity['path']}")
     print(f"  md5 {digests['md5']}  sha256 {digests['sha256'][:16]}  "
           f"(inventory entry {record['arm']}{record['seed']})")
@@ -884,8 +899,9 @@ def evaluate(arguments, counters):
           f"of {agreement['source']}")
     print(f"  {filename_rule}")
     print(f"  class support spans {min(support.values())} to "
-          f"{max(support.values())} images over {NUM_CLASSES} classes; the "
-          "split carries no track identifiers, so there is no per-sign support")
+          f"{max(support.values())} images over all {NUM_CLASSES} classes, "
+          "each of which the labels were confirmed to carry; the split "
+          "carries no track identifiers, so there is no per-sign support")
 
     # Wrapped before any condition is built, so every read the sweep and the
     # fingerprints make goes through one counter.
@@ -951,9 +967,10 @@ def evaluate(arguments, counters):
             ("macro F1", reference_f1, direct_f1)):
         if abs(through_matrix - direct) > METRIC_TOLERANCE:
             raise RuntimeError(
-                f"{name} from the confusion matrix is {through_matrix!r} but "
-                f"{direct!r} counted directly from the prediction and label "
-                "vectors; the metric path is wrong")
+                f"the {name} read off the confusion matrix and the {name} "
+                "counted directly from the prediction and label vectors "
+                f"differ by {abs(through_matrix - direct):.3g}, more than "
+                f"{METRIC_TOLERANCE:g}; the metric path is wrong")
     print(f"  {reference['seen']} images in the official label order, "
           "cross-checked against a direct count of the prediction and label "
           "vectors")
@@ -986,8 +1003,10 @@ def evaluate(arguments, counters):
                 ("macro_f1", macro_f1, direct_f1)):
             if abs(through_matrix - direct) > METRIC_TOLERANCE:
                 raise RuntimeError(
-                    f"{corruption} s{severity} {name}: confusion matrix gives "
-                    f"{through_matrix!r}, direct count gives {direct!r}")
+                    f"{corruption} s{severity}: the confusion matrix {name} "
+                    "and the direct count differ by "
+                    f"{abs(through_matrix - direct):.3g}, more than "
+                    f"{METRIC_TOLERANCE:g}")
         fingerprints[f"{corruption}_s{severity}"] = input_fingerprint(
             condition_dataset, fingerprint_positions)
         measurement.update({"accuracy": accuracy, "macro_f1": macro_f1,
@@ -1025,8 +1044,9 @@ def evaluate(arguments, counters):
             ("macro_f1", clean_row["macro_f1"], reference_f1)):
         if abs(swept - referenced) > CLEAN_TOLERANCE:
             raise RuntimeError(
-                f"sweep clean {name} {swept:.6f} differs from the reference "
-                f"{referenced:.6f} by more than {CLEAN_TOLERANCE:g}")
+                f"the sweep's clean {name} and the data.py reference run's "
+                f"differ by {abs(swept - referenced):.3g}, more than "
+                f"{CLEAN_TOLERANCE:g}")
     print("\nSweep clean row: identical predictions to the data.py test "
           "reference run, so every drop is measured against this model's own "
           "clean test score")
