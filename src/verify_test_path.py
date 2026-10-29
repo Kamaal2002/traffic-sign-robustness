@@ -1,4 +1,4 @@
-"""Checks on the official-test evaluation path that read no official test image.
+"""Checks on the official-test evaluation path that decode no test image.
 
     PYTHONPATH=. .venv/bin/python -m src.verify_test_path
     PYTHONPATH=. .venv/bin/python -m src.verify_test_path --post-run
@@ -23,10 +23,20 @@ path reaching for a real image fails loudly instead of quietly succeeding; and
 `evaluate_test.build_test_observations` is replaced the same way. Both are
 restored at the end and their call counts are reported.
 
-The one official file this reads is `GT-final_test.csv`, for its structure: row
-count, header and label range, all of which the protocol's pre-run checks
-already require. No label distribution is printed and nothing here chooses an
-analysis setting from it.
+What it does touch of the official release, and what it deliberately does not,
+separates into five things. It parses `GT-final_test.csv` for its structure:
+row count, header and label range, all of which the protocol's pre-run checks
+already require. It MD5s each of the three GTSRB archives still present on
+disk against the digest torchvision records, as Part 10 check 3 specifies, and
+reports how many it found. It reads the raw bytes of every training and test
+`.ppm` and SHA-256s them, to prove no file appears in both splits. It decodes
+no image in either split, so no pixel of an official test image reaches a
+tensor here. And it computes no prediction on official data: the checks that do
+run a model run it on synthetic images.
+
+No label distribution is printed and nothing here chooses an analysis setting
+from the ground truth. A byte digest is not a measurement, and the integrity
+checks above cannot produce test performance information.
 """
 
 import argparse
