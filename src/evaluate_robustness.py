@@ -68,7 +68,7 @@ RESULTS_DIR = PROJECT_ROOT / "artifacts" / "robustness" / "baseline"
 EXPECTED_CHECKPOINT_MD5 = "7c6ea3f9773d7a644235463d6a02bf0f"
 EXPECTED_EPOCH = 21
 EXPECTED_VALIDATION_SIZE = 5340
-# Recorded in the accepted checkpoint and reported in src/README.md.
+# Recorded in the accepted checkpoint and reported in docs/reproduction.md.
 ACCEPTED_CLEAN = {"loss": 0.047733, "accuracy": 0.987640, "macro_f1": 0.974451}
 # Clean reproduction has to be exact on the same device and build; this slack is
 # only to give a readable failure rather than a bit-comparison assert.

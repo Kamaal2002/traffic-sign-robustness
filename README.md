@@ -65,7 +65,9 @@ checkpoint, reused rather than retrained.
 
 **Data.** The torchvision GTSRB training archive holds 26,640 images in 888
 tracks of 30 frames, one track per physical sign, split at the track level so
-no sign contributes frames to both sides.
+no sign contributes frames to both sides. An image-level split of this archive
+put 887 of the 888 tracks on both sides, which would leave validation close to
+a memorisation check.
 
 | Split | Tracks | Images |
 |---|---:|---:|
@@ -154,16 +156,14 @@ averaged over seeds 42, 43 and 44. Bars are the across-seed mean; the open
 markers are the three individual seeds. The markers show seed spread and are
 not uncertainty intervals.
 
-* [Figure 2](figures/fig2_per_family_contrasts.pdf) — the B−A and C−B
+* [Figure 2](figures/fig2_per_family_contrasts.png) — the B−A and C−B
   differences family by family, both columns ordered by the B−A effect so the
   rows line up. Each contrast column shares a horizontal scale across the
   original and held-out suites; the B−A and C−B columns have different scales.
-* [Figure 3](figures/fig3_severity.pdf) — error against severity levels 1 to 5
+* [Figure 3](figures/fig3_severity.png) — error against severity levels 1 to 5
   for each policy, and the C−B difference at each level.
-* [Figure 4](figures/fig4_clean_versus_corruption.pdf) — clean accuracy against
+* [Figure 4](figures/fig4_clean_versus_corruption.png) — clean accuracy against
   corruption error for all nine checkpoints.
-
-PNG versions of all four sit beside the PDFs in [figures/](figures/).
 
 ## Interpretation
 
@@ -250,13 +250,13 @@ src/        data pipeline, model, the three training entry points, the two
             corruption suites, validation and official-test evaluation and
             comparison, verification utilities and plotting scripts
 docs/       the frozen protocols, the reproduction guide, the findings
-figures/    the four figures, PDF and PNG
+figures/    the four figures, PNG
 notebooks/  01_data_exploration.ipynb
 ```
 
-* [src/README.md](src/README.md) — the data pipeline and the clean baseline,
+* [docs/reproduction.md](docs/reproduction.md) — the full workflow, with the
+  data pipeline and the clean baseline's configuration in section 14,
   including the track-level split and checkpoint selection using macro F1
-* [docs/reproduction.md](docs/reproduction.md) — the full workflow
 * [docs/augmentation_protocol.md](docs/augmentation_protocol.md) and
   [docs/final_test_protocol.md](docs/final_test_protocol.md) — the two frozen
   protocols, with departures recorded in
