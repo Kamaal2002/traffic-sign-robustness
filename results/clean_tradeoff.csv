@@ -1,0 +1,19 @@
+suite,seed,contrast,clean_accuracy_cost,corrupted_error_change,exceeds_clean_limit,verdict
+frozen,42,B-A,0.0,-0.09209026128266032,False,improvement within the clean-accuracy limit
+frozen,42,C-A,0.0033254156769596532,-0.09182633940353656,False,improvement within the clean-accuracy limit
+frozen,42,C-B,0.0033254156769596532,0.0002639218791237797,False,no corrupted gain
+frozen,43,B-A,0.0032462391132225266,-0.08006070203219846,False,improvement within the clean-accuracy limit
+frozen,43,C-A,-0.000950118764845409,-0.09282396410662445,False,improvement within the clean-accuracy limit
+frozen,43,C-B,-0.004196357878067936,-0.01276326207442597,False,improvement within the clean-accuracy limit
+frozen,44,B-A,-0.004829770387964949,-0.10570071258907364,False,improvement within the clean-accuracy limit
+frozen,44,C-A,-0.003087885985748162,-0.10656901557139087,False,improvement within the clean-accuracy limit
+frozen,44,C-B,0.0017418844022167868,-0.000868302982317234,False,improvement within the clean-accuracy limit
+heldout,42,B-A,0.0,-0.07372604908946952,False,improvement within the clean-accuracy limit
+heldout,42,C-A,0.0033254156769596532,-0.06578305621536025,False,improvement within the clean-accuracy limit
+heldout,42,C-B,0.0033254156769596532,0.007942992874109264,False,no corrupted gain
+heldout,43,B-A,0.0032462391132225266,-0.030235946159936657,False,improvement within the clean-accuracy limit
+heldout,43,C-A,-0.000950118764845409,-0.030045922406967535,False,improvement within the clean-accuracy limit
+heldout,43,C-B,-0.004196357878067936,0.00019002375296912132,False,no corrupted gain
+heldout,44,B-A,-0.004829770387964949,-0.06241646872525733,False,improvement within the clean-accuracy limit
+heldout,44,C-A,-0.003087885985748162,-0.05555344418052256,False,improvement within the clean-accuracy limit
+heldout,44,C-B,0.0017418844022167868,0.006863024544734759,False,no corrupted gain

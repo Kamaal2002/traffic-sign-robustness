@@ -1,0 +1,2060 @@
+{
+  "models": [
+    {
+      "name": "clean",
+      "seed": 42,
+      "dir": "artifacts/final_test/clean_seed42"
+    },
+    {
+      "name": "clean",
+      "seed": 43,
+      "dir": "artifacts/final_test/clean_seed43"
+    },
+    {
+      "name": "clean",
+      "seed": 44,
+      "dir": "artifacts/final_test/clean_seed44"
+    },
+    {
+      "name": "balanced",
+      "seed": 42,
+      "dir": "artifacts/final_test/balanced_seed42"
+    },
+    {
+      "name": "balanced",
+      "seed": 43,
+      "dir": "artifacts/final_test/balanced_seed43"
+    },
+    {
+      "name": "balanced",
+      "seed": 44,
+      "dir": "artifacts/final_test/balanced_seed44"
+    },
+    {
+      "name": "targeted",
+      "seed": 42,
+      "dir": "artifacts/final_test/targeted_seed42"
+    },
+    {
+      "name": "targeted",
+      "seed": 43,
+      "dir": "artifacts/final_test/targeted_seed43"
+    },
+    {
+      "name": "targeted",
+      "seed": 44,
+      "dir": "artifacts/final_test/targeted_seed44"
+    }
+  ],
+  "model_identity": {
+    "clean_seed42": {
+      "name": "clean",
+      "seed": 42,
+      "dir": "artifacts/final_test/clean_seed42",
+      "checkpoint_path": "artifacts/baseline/best_checkpoint.pt",
+      "checkpoint_md5": "7c6ea3f9773d7a644235463d6a02bf0f",
+      "checkpoint_epoch": 21,
+      "recorded_arm": "clean baseline",
+      "suites_verified": [
+        "frozen",
+        "heldout"
+      ],
+      "training_provenance": {
+        "checkpoint_file": "best_checkpoint.pt",
+        "checkpoint_md5": "7c6ea3f9773d7a644235463d6a02bf0f",
+        "training_seed": 42,
+        "best_epoch": 21,
+        "selection_metric": "validation_macro_f1",
+        "policy_name": null,
+        "protocol": null,
+        "protocol_record": null,
+        "policy_record": null,
+        "history_record": "artifacts/baseline/history.json",
+        "verified": [
+          "selected epoch 21",
+          "selected on validation_macro_f1",
+          "training seed 42",
+          "the validation metrics recorded at that epoch, exactly",
+          "the filename the run wrote (best_checkpoint.pt)",
+          "no policy record, which is the clean recipe's output"
+        ],
+        "unverifiable": [
+          "no protocol.json beside best_checkpoint.pt, so the protocol version this run was started under is not recorded; the accepted baseline predates the frozen protocol"
+        ]
+      },
+      "training_protocol": null
+    },
+    "clean_seed43": {
+      "name": "clean",
+      "seed": 43,
+      "dir": "artifacts/final_test/clean_seed43",
+      "checkpoint_path": "artifacts/clean_seed43/best_checkpoint.pt",
+      "checkpoint_md5": "0390dd3efb8792016955c5d0edc61500",
+      "checkpoint_epoch": 27,
+      "recorded_arm": "clean baseline",
+      "suites_verified": [
+        "frozen",
+        "heldout"
+      ],
+      "training_provenance": {
+        "checkpoint_file": "best_checkpoint.pt",
+        "checkpoint_md5": "0390dd3efb8792016955c5d0edc61500",
+        "training_seed": 43,
+        "best_epoch": 27,
+        "selection_metric": "validation_macro_f1",
+        "policy_name": null,
+        "protocol": {
+          "manifest": "docs/augmentation_manifest.json",
+          "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+          "files": {
+            "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+            "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+            "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+          },
+          "differs_from_manifest": [],
+          "matches_manifest": true
+        },
+        "protocol_record": "artifacts/clean_seed43/protocol.json",
+        "policy_record": null,
+        "history_record": "artifacts/clean_seed43/history.json",
+        "verified": [
+          "selected epoch 27",
+          "selected on validation_macro_f1",
+          "training seed 43",
+          "the validation metrics recorded at that epoch, exactly",
+          "the filename the run wrote (best_checkpoint.pt)",
+          "the protocol record's training seed",
+          "started under the protocol frozen in docs/augmentation_manifest.json",
+          "no policy record, which is the clean recipe's output"
+        ],
+        "unverifiable": []
+      },
+      "training_protocol": {
+        "manifest": "docs/augmentation_manifest.json",
+        "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+        "files": {
+          "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+          "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+          "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+        },
+        "differs_from_manifest": [],
+        "matches_manifest": true
+      }
+    },
+    "clean_seed44": {
+      "name": "clean",
+      "seed": 44,
+      "dir": "artifacts/final_test/clean_seed44",
+      "checkpoint_path": "artifacts/clean_seed44/best_checkpoint.pt",
+      "checkpoint_md5": "3e4f07defd52018279f98f7263acdbff",
+      "checkpoint_epoch": 30,
+      "recorded_arm": "clean baseline",
+      "suites_verified": [
+        "frozen",
+        "heldout"
+      ],
+      "training_provenance": {
+        "checkpoint_file": "best_checkpoint.pt",
+        "checkpoint_md5": "3e4f07defd52018279f98f7263acdbff",
+        "training_seed": 44,
+        "best_epoch": 30,
+        "selection_metric": "validation_macro_f1",
+        "policy_name": null,
+        "protocol": {
+          "manifest": "docs/augmentation_manifest.json",
+          "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+          "files": {
+            "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+            "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+            "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+          },
+          "differs_from_manifest": [],
+          "matches_manifest": true
+        },
+        "protocol_record": "artifacts/clean_seed44/protocol.json",
+        "policy_record": null,
+        "history_record": "artifacts/clean_seed44/history.json",
+        "verified": [
+          "selected epoch 30",
+          "selected on validation_macro_f1",
+          "training seed 44",
+          "the validation metrics recorded at that epoch, exactly",
+          "the filename the run wrote (best_checkpoint.pt)",
+          "the protocol record's training seed",
+          "started under the protocol frozen in docs/augmentation_manifest.json",
+          "no policy record, which is the clean recipe's output"
+        ],
+        "unverifiable": []
+      },
+      "training_protocol": {
+        "manifest": "docs/augmentation_manifest.json",
+        "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+        "files": {
+          "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+          "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+          "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+        },
+        "differs_from_manifest": [],
+        "matches_manifest": true
+      }
+    },
+    "balanced_seed42": {
+      "name": "balanced",
+      "seed": 42,
+      "dir": "artifacts/final_test/balanced_seed42",
+      "checkpoint_path": "artifacts/augmented_balanced_seed42/best_checkpoint.pt",
+      "checkpoint_md5": "ae08ff97fbae0f6d70cc3636f6a33052",
+      "checkpoint_epoch": 29,
+      "recorded_arm": "augmented (balanced)",
+      "suites_verified": [
+        "frozen",
+        "heldout"
+      ],
+      "training_provenance": {
+        "checkpoint_file": "best_checkpoint.pt",
+        "checkpoint_md5": "ae08ff97fbae0f6d70cc3636f6a33052",
+        "training_seed": 42,
+        "best_epoch": 29,
+        "selection_metric": "validation_macro_f1",
+        "policy_name": "balanced",
+        "protocol": {
+          "manifest": "docs/augmentation_manifest.json",
+          "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+          "files": {
+            "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+            "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+            "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+          },
+          "differs_from_manifest": [],
+          "matches_manifest": true
+        },
+        "protocol_record": "artifacts/augmented_balanced_seed42/protocol.json",
+        "policy_record": "artifacts/augmented_balanced_seed42/policy.json",
+        "history_record": "artifacts/augmented_balanced_seed42/history.json",
+        "verified": [
+          "selected epoch 29",
+          "selected on validation_macro_f1",
+          "training seed 42",
+          "the validation metrics recorded at that epoch, exactly",
+          "the filename the run wrote (best_checkpoint.pt)",
+          "the protocol record's training seed",
+          "started under the protocol frozen in docs/augmentation_manifest.json",
+          "the policy record's training seed",
+          "the augmentation stream's base seed",
+          "the policy record's best epoch"
+        ],
+        "unverifiable": [
+          "the checkpoint carries no policy field, so the arm name comes from artifacts/augmented_balanced_seed42/policy.json; a checkpoint from a run with the same seed and configuration but a different policy could not be distinguished by its contents"
+        ]
+      },
+      "training_protocol": {
+        "manifest": "docs/augmentation_manifest.json",
+        "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+        "files": {
+          "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+          "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+          "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+        },
+        "differs_from_manifest": [],
+        "matches_manifest": true
+      }
+    },
+    "balanced_seed43": {
+      "name": "balanced",
+      "seed": 43,
+      "dir": "artifacts/final_test/balanced_seed43",
+      "checkpoint_path": "artifacts/augmented_balanced_seed43/best_checkpoint.pt",
+      "checkpoint_md5": "c6249e311c927a27569179ee0ac610c4",
+      "checkpoint_epoch": 16,
+      "recorded_arm": "augmented (balanced)",
+      "suites_verified": [
+        "frozen",
+        "heldout"
+      ],
+      "training_provenance": {
+        "checkpoint_file": "best_checkpoint.pt",
+        "checkpoint_md5": "c6249e311c927a27569179ee0ac610c4",
+        "training_seed": 43,
+        "best_epoch": 16,
+        "selection_metric": "validation_macro_f1",
+        "policy_name": "balanced",
+        "protocol": {
+          "manifest": "docs/augmentation_manifest.json",
+          "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+          "files": {
+            "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+            "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+            "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+          },
+          "differs_from_manifest": [],
+          "matches_manifest": true
+        },
+        "protocol_record": "artifacts/augmented_balanced_seed43/protocol.json",
+        "policy_record": "artifacts/augmented_balanced_seed43/policy.json",
+        "history_record": "artifacts/augmented_balanced_seed43/history.json",
+        "verified": [
+          "selected epoch 16",
+          "selected on validation_macro_f1",
+          "training seed 43",
+          "the validation metrics recorded at that epoch, exactly",
+          "the filename the run wrote (best_checkpoint.pt)",
+          "the protocol record's training seed",
+          "started under the protocol frozen in docs/augmentation_manifest.json",
+          "the policy record's training seed",
+          "the augmentation stream's base seed",
+          "the policy record's best epoch"
+        ],
+        "unverifiable": [
+          "the checkpoint carries no policy field, so the arm name comes from artifacts/augmented_balanced_seed43/policy.json; a checkpoint from a run with the same seed and configuration but a different policy could not be distinguished by its contents"
+        ]
+      },
+      "training_protocol": {
+        "manifest": "docs/augmentation_manifest.json",
+        "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+        "files": {
+          "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+          "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+          "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+        },
+        "differs_from_manifest": [],
+        "matches_manifest": true
+      }
+    },
+    "balanced_seed44": {
+      "name": "balanced",
+      "seed": 44,
+      "dir": "artifacts/final_test/balanced_seed44",
+      "checkpoint_path": "artifacts/augmented_balanced_seed44/best_checkpoint.pt",
+      "checkpoint_md5": "5e46b7de1324ba7f9e50dc87a51e16ca",
+      "checkpoint_epoch": 29,
+      "recorded_arm": "augmented (balanced)",
+      "suites_verified": [
+        "frozen",
+        "heldout"
+      ],
+      "training_provenance": {
+        "checkpoint_file": "best_checkpoint.pt",
+        "checkpoint_md5": "5e46b7de1324ba7f9e50dc87a51e16ca",
+        "training_seed": 44,
+        "best_epoch": 29,
+        "selection_metric": "validation_macro_f1",
+        "policy_name": "balanced",
+        "protocol": {
+          "manifest": "docs/augmentation_manifest.json",
+          "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+          "files": {
+            "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+            "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+            "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+          },
+          "differs_from_manifest": [],
+          "matches_manifest": true
+        },
+        "protocol_record": "artifacts/augmented_balanced_seed44/protocol.json",
+        "policy_record": "artifacts/augmented_balanced_seed44/policy.json",
+        "history_record": "artifacts/augmented_balanced_seed44/history.json",
+        "verified": [
+          "selected epoch 29",
+          "selected on validation_macro_f1",
+          "training seed 44",
+          "the validation metrics recorded at that epoch, exactly",
+          "the filename the run wrote (best_checkpoint.pt)",
+          "the protocol record's training seed",
+          "started under the protocol frozen in docs/augmentation_manifest.json",
+          "the policy record's training seed",
+          "the augmentation stream's base seed",
+          "the policy record's best epoch"
+        ],
+        "unverifiable": [
+          "the checkpoint carries no policy field, so the arm name comes from artifacts/augmented_balanced_seed44/policy.json; a checkpoint from a run with the same seed and configuration but a different policy could not be distinguished by its contents"
+        ]
+      },
+      "training_protocol": {
+        "manifest": "docs/augmentation_manifest.json",
+        "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+        "files": {
+          "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+          "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+          "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+        },
+        "differs_from_manifest": [],
+        "matches_manifest": true
+      }
+    },
+    "targeted_seed42": {
+      "name": "targeted",
+      "seed": 42,
+      "dir": "artifacts/final_test/targeted_seed42",
+      "checkpoint_path": "artifacts/augmented_targeted_seed42/best_checkpoint.pt",
+      "checkpoint_md5": "4eda6565ab4f640ecbd49d4ab4f93a30",
+      "checkpoint_epoch": 29,
+      "recorded_arm": "augmented (targeted)",
+      "suites_verified": [
+        "frozen",
+        "heldout"
+      ],
+      "training_provenance": {
+        "checkpoint_file": "best_checkpoint.pt",
+        "checkpoint_md5": "4eda6565ab4f640ecbd49d4ab4f93a30",
+        "training_seed": 42,
+        "best_epoch": 29,
+        "selection_metric": "validation_macro_f1",
+        "policy_name": "targeted",
+        "protocol": {
+          "manifest": "docs/augmentation_manifest.json",
+          "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+          "files": {
+            "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+            "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+            "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+          },
+          "differs_from_manifest": [],
+          "matches_manifest": true
+        },
+        "protocol_record": "artifacts/augmented_targeted_seed42/protocol.json",
+        "policy_record": "artifacts/augmented_targeted_seed42/policy.json",
+        "history_record": "artifacts/augmented_targeted_seed42/history.json",
+        "verified": [
+          "selected epoch 29",
+          "selected on validation_macro_f1",
+          "training seed 42",
+          "the validation metrics recorded at that epoch, exactly",
+          "the filename the run wrote (best_checkpoint.pt)",
+          "the protocol record's training seed",
+          "started under the protocol frozen in docs/augmentation_manifest.json",
+          "the policy record's training seed",
+          "the augmentation stream's base seed",
+          "the policy record's best epoch"
+        ],
+        "unverifiable": [
+          "the checkpoint carries no policy field, so the arm name comes from artifacts/augmented_targeted_seed42/policy.json; a checkpoint from a run with the same seed and configuration but a different policy could not be distinguished by its contents"
+        ]
+      },
+      "training_protocol": {
+        "manifest": "docs/augmentation_manifest.json",
+        "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+        "files": {
+          "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+          "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+          "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+        },
+        "differs_from_manifest": [],
+        "matches_manifest": true
+      }
+    },
+    "targeted_seed43": {
+      "name": "targeted",
+      "seed": 43,
+      "dir": "artifacts/final_test/targeted_seed43",
+      "checkpoint_path": "artifacts/augmented_targeted_seed43/best_checkpoint.pt",
+      "checkpoint_md5": "9fe27b5fec2bf8ba761957e1af04273d",
+      "checkpoint_epoch": 20,
+      "recorded_arm": "augmented (targeted)",
+      "suites_verified": [
+        "frozen",
+        "heldout"
+      ],
+      "training_provenance": {
+        "checkpoint_file": "best_checkpoint.pt",
+        "checkpoint_md5": "9fe27b5fec2bf8ba761957e1af04273d",
+        "training_seed": 43,
+        "best_epoch": 20,
+        "selection_metric": "validation_macro_f1",
+        "policy_name": "targeted",
+        "protocol": {
+          "manifest": "docs/augmentation_manifest.json",
+          "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+          "files": {
+            "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+            "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+            "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+          },
+          "differs_from_manifest": [],
+          "matches_manifest": true
+        },
+        "protocol_record": "artifacts/augmented_targeted_seed43/protocol.json",
+        "policy_record": "artifacts/augmented_targeted_seed43/policy.json",
+        "history_record": "artifacts/augmented_targeted_seed43/history.json",
+        "verified": [
+          "selected epoch 20",
+          "selected on validation_macro_f1",
+          "training seed 43",
+          "the validation metrics recorded at that epoch, exactly",
+          "the filename the run wrote (best_checkpoint.pt)",
+          "the protocol record's training seed",
+          "started under the protocol frozen in docs/augmentation_manifest.json",
+          "the policy record's training seed",
+          "the augmentation stream's base seed",
+          "the policy record's best epoch"
+        ],
+        "unverifiable": [
+          "the checkpoint carries no policy field, so the arm name comes from artifacts/augmented_targeted_seed43/policy.json; a checkpoint from a run with the same seed and configuration but a different policy could not be distinguished by its contents"
+        ]
+      },
+      "training_protocol": {
+        "manifest": "docs/augmentation_manifest.json",
+        "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+        "files": {
+          "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+          "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+          "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+        },
+        "differs_from_manifest": [],
+        "matches_manifest": true
+      }
+    },
+    "targeted_seed44": {
+      "name": "targeted",
+      "seed": 44,
+      "dir": "artifacts/final_test/targeted_seed44",
+      "checkpoint_path": "artifacts/augmented_targeted_seed44/best_checkpoint.pt",
+      "checkpoint_md5": "a00b5d79ac911be39898fd20e35a06f2",
+      "checkpoint_epoch": 29,
+      "recorded_arm": "augmented (targeted)",
+      "suites_verified": [
+        "frozen",
+        "heldout"
+      ],
+      "training_provenance": {
+        "checkpoint_file": "best_checkpoint.pt",
+        "checkpoint_md5": "a00b5d79ac911be39898fd20e35a06f2",
+        "training_seed": 44,
+        "best_epoch": 29,
+        "selection_metric": "validation_macro_f1",
+        "policy_name": "targeted",
+        "protocol": {
+          "manifest": "docs/augmentation_manifest.json",
+          "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+          "files": {
+            "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+            "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+            "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+          },
+          "differs_from_manifest": [],
+          "matches_manifest": true
+        },
+        "protocol_record": "artifacts/augmented_targeted_seed44/protocol.json",
+        "policy_record": "artifacts/augmented_targeted_seed44/policy.json",
+        "history_record": "artifacts/augmented_targeted_seed44/history.json",
+        "verified": [
+          "selected epoch 29",
+          "selected on validation_macro_f1",
+          "training seed 44",
+          "the validation metrics recorded at that epoch, exactly",
+          "the filename the run wrote (best_checkpoint.pt)",
+          "the protocol record's training seed",
+          "started under the protocol frozen in docs/augmentation_manifest.json",
+          "the policy record's training seed",
+          "the augmentation stream's base seed",
+          "the policy record's best epoch"
+        ],
+        "unverifiable": [
+          "the checkpoint carries no policy field, so the arm name comes from artifacts/augmented_targeted_seed44/policy.json; a checkpoint from a run with the same seed and configuration but a different policy could not be distinguished by its contents"
+        ]
+      },
+      "training_protocol": {
+        "manifest": "docs/augmentation_manifest.json",
+        "manifest_sha256": "5b008c6856e292655faf3bb0ded9bdf3446437c966a76693c5a3f5fca4cf0ebd",
+        "files": {
+          "docs/augmentation_protocol.md": "a7e362cba33888a68bf8591c298aac2ca1278351f2a60d4c36534ece1621b642",
+          "src/augmentation.py": "86bd4ec0c701df0848f5d35ebdfeee9e64efccbd76331a5448f99ddaf34c3053",
+          "src/corruptions_heldout.py": "dba177035c0d8ed96fb4d7d02a65b7183133489d90de273e6ff4b383ee43eb41"
+        },
+        "differs_from_manifest": [],
+        "matches_manifest": true
+      }
+    }
+  },
+  "identity_fields_enforced": [
+    "model.name",
+    "model.seed",
+    "model.arm",
+    "model.training_records.best_epoch",
+    "checkpoint.path",
+    "checkpoint.md5",
+    "checkpoint.epoch",
+    "checkpoint.seed"
+  ],
+  "test_provenance": {
+    "clean_seed42": {
+      "checkpoint_md5": "7c6ea3f9773d7a644235463d6a02bf0f",
+      "checkpoint_sha256": "2941621839627e30f2c25cfc8fe293cf988f6e150b674c64fa62937a8cd7508e",
+      "selected_epoch": 21,
+      "split": "official_test",
+      "namespace": "final_test"
+    },
+    "clean_seed43": {
+      "checkpoint_md5": "0390dd3efb8792016955c5d0edc61500",
+      "checkpoint_sha256": "cbdcfddcf596f09facaf88358128ed5efe1a89f44b8cc92ef9f8219e982e88a9",
+      "selected_epoch": 27,
+      "split": "official_test",
+      "namespace": "final_test"
+    },
+    "clean_seed44": {
+      "checkpoint_md5": "3e4f07defd52018279f98f7263acdbff",
+      "checkpoint_sha256": "d3d70aca64811f33cf6111cd9f2eaf34a821a173b77df20e4b7aed92b212fcea",
+      "selected_epoch": 30,
+      "split": "official_test",
+      "namespace": "final_test"
+    },
+    "balanced_seed42": {
+      "checkpoint_md5": "ae08ff97fbae0f6d70cc3636f6a33052",
+      "checkpoint_sha256": "c74c188078313c048adf157183e34a02c3f89d4be1cf141df7e2aa7424b73263",
+      "selected_epoch": 29,
+      "split": "official_test",
+      "namespace": "final_test"
+    },
+    "balanced_seed43": {
+      "checkpoint_md5": "c6249e311c927a27569179ee0ac610c4",
+      "checkpoint_sha256": "2bac1bdfce0aa0b24aa497b09dd65a4e758c3a5e3bb0207b856d86fd85366d39",
+      "selected_epoch": 16,
+      "split": "official_test",
+      "namespace": "final_test"
+    },
+    "balanced_seed44": {
+      "checkpoint_md5": "5e46b7de1324ba7f9e50dc87a51e16ca",
+      "checkpoint_sha256": "8f5d9cb655185b1cf0bccfd53f964a03f6c60d8e81f9a82f5ac2a68080f2e5d5",
+      "selected_epoch": 29,
+      "split": "official_test",
+      "namespace": "final_test"
+    },
+    "targeted_seed42": {
+      "checkpoint_md5": "4eda6565ab4f640ecbd49d4ab4f93a30",
+      "checkpoint_sha256": "126084e0eab2f4eecc52894c41986b07e12acdaeb7df85807c78ae541e29bafe",
+      "selected_epoch": 29,
+      "split": "official_test",
+      "namespace": "final_test"
+    },
+    "targeted_seed43": {
+      "checkpoint_md5": "9fe27b5fec2bf8ba761957e1af04273d",
+      "checkpoint_sha256": "60acb884e3e3e05d743f84a92a04fc231e5e463fce93d2345169dbed0256dcdc",
+      "selected_epoch": 20,
+      "split": "official_test",
+      "namespace": "final_test"
+    },
+    "targeted_seed44": {
+      "checkpoint_md5": "a00b5d79ac911be39898fd20e35a06f2",
+      "checkpoint_sha256": "13a417a164c7af3491f972bac4b0ee87cf4dd7544b399879673a8027c0693e08",
+      "selected_epoch": 29,
+      "split": "official_test",
+      "namespace": "final_test"
+    }
+  },
+  "protocol": {
+    "split": "official_test",
+    "namespace": "final_test",
+    "primary_metric": "mean per-image error rate, conditions equally weighted, clean excluded",
+    "aggregation": [
+      "image error under one condition",
+      "equal mean over the suite's corrupted conditions",
+      "paired bootstrap over whole images"
+    ],
+    "bootstrap_draws": 2000,
+    "bootstrap_seed": 42,
+    "interval": [
+      2.5,
+      97.5
+    ],
+    "images": 12630,
+    "resampling_unit": "one official test image",
+    "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence",
+    "accounts_for_physical_sign_dependence": false,
+    "track_structure_available": false,
+    "clean_accuracy_limit": 0.01,
+    "clean_accuracy_limit_is_a_pass_criterion": false,
+    "clean_cost_measured_against": "the contrast's own right-hand arm at the same seed",
+    "clean_cost_reference_note": "Clean cost is measured against the contrast's own right-hand arm at the same seed, so the C-B cost is B's clean accuracy minus C's. This follows the frozen protocol's Part 7 paragraph on clean_tradeoff_rows and the imported function itself. The bullet in the same part's reporting list that reads \"the cost against arm A at the same seed\" conflicts with both; it differs only on the C-B row and was not followed. The limit is a reporting rule either way and the decision rule is unaffected.",
+    "verdict_wording": "The rule above is the imported validation rule, so its wording says per-sign. On the official test split there are no physical-sign identifiers and the unit is the image: the quantity compared at each seed is the mean per-image error over the equally weighted corrupted conditions.",
+    "decision_rule": "C is preferred over B only if C's mean per-image error is lower at every training seed on both suites; the rule references no interval",
+    "suites": [
+      "frozen",
+      "heldout"
+    ],
+    "suites_are_co_primary": true,
+    "held_out_families": [
+      "contrast_reduction",
+      "jpeg_compression",
+      "motion_blur",
+      "rotation",
+      "salt_pepper"
+    ],
+    "seed_variability": "reported as a direction, a mean and a range over three runs; never combined with image-level sampling uncertainty and never reported as significance",
+    "descriptive_metrics": {
+      "class_balanced_error": {
+        "aggregation": [
+          "image error under one condition",
+          "mean within a class",
+          "equal mean over the classes present",
+          "equal mean over conditions"
+        ],
+        "intervals": false,
+        "per_class_inference": false,
+        "used_for_checkpoint_selection": false,
+        "used_for_the_success_criterion": false
+      },
+      "per_class_recall": {
+        "intervals": false,
+        "used_for_the_success_criterion": false
+      }
+    },
+    "design_effect_illustration": {
+      "assumed_cluster_size": 30,
+      "assumed_within_cluster_correlation": 1.0,
+      "appears_only_in": "design_effect_sensitivity.csv",
+      "is_a_confidence_bound": false,
+      "is_a_corrected_interval": false,
+      "enters_the_decision_rule": false
+    }
+  },
+  "input_pairing": {
+    "frozen": {
+      "conditions_matched": 31,
+      "reference": "clean_seed42"
+    },
+    "heldout": {
+      "conditions_matched": 26,
+      "reference": "clean_seed42"
+    }
+  },
+  "input_pairing_note": "equal fingerprints establish that the arms were shown the same inputs; they do not establish which checkpoint produced the predictions, which is what model_identity records",
+  "arm_error_rates": [
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "arm": "B",
+      "model": "balanced",
+      "mean_image_error": 0.0628846661388229,
+      "ci_low": 0.060794338875692785,
+      "ci_high": 0.0650568091844814,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "arm": "A",
+      "model": "clean",
+      "mean_image_error": 0.15497492742148322,
+      "ci_low": 0.1523271971496437,
+      "ci_high": 0.1574643705463183,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "arm": "C",
+      "model": "targeted",
+      "mean_image_error": 0.06314858801794668,
+      "ci_low": 0.06081756400105569,
+      "ci_high": 0.06560840591185009,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "arm": "B",
+      "model": "balanced",
+      "mean_image_error": 0.08272895223013987,
+      "ci_low": 0.08020295592504618,
+      "ci_high": 0.08533927157561363,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "arm": "A",
+      "model": "clean",
+      "mean_image_error": 0.16278965426233835,
+      "ci_low": 0.16017913697545524,
+      "ci_high": 0.16545566112430724,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "arm": "C",
+      "model": "targeted",
+      "mean_image_error": 0.06996569015571391,
+      "ci_low": 0.06757970440749538,
+      "ci_high": 0.0725232251253629,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "arm": "B",
+      "model": "balanced",
+      "mean_image_error": 0.06479282132488783,
+      "ci_low": 0.0625758115597783,
+      "ci_high": 0.0672316574294009,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "arm": "A",
+      "model": "clean",
+      "mean_image_error": 0.1704935339139615,
+      "ci_low": 0.16752144365267882,
+      "ci_high": 0.17338638163103723,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "arm": "C",
+      "model": "targeted",
+      "mean_image_error": 0.06392451834257061,
+      "ci_low": 0.06154077593032462,
+      "ci_high": 0.06644767748746372,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "arm": "B",
+      "model": "balanced",
+      "mean_image_error": 0.07413143309580364,
+      "ci_low": 0.07180031670625496,
+      "ci_high": 0.07642501979414093,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "arm": "A",
+      "model": "clean",
+      "mean_image_error": 0.14785748218527317,
+      "ci_low": 0.14510783847981,
+      "ci_high": 0.15052114014251783,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "arm": "C",
+      "model": "targeted",
+      "mean_image_error": 0.08207442596991289,
+      "ci_low": 0.0795311163895487,
+      "ci_high": 0.0847095803642122,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "arm": "B",
+      "model": "balanced",
+      "mean_image_error": 0.09145209817893903,
+      "ci_low": 0.08877585114806018,
+      "ci_high": 0.0943886777513856,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "arm": "A",
+      "model": "clean",
+      "mean_image_error": 0.1216880443388757,
+      "ci_low": 0.11893262074425971,
+      "ci_high": 0.12452897862232779,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "arm": "C",
+      "model": "targeted",
+      "mean_image_error": 0.09164212193190815,
+      "ci_low": 0.08903808392715755,
+      "ci_high": 0.09438836104513063,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "arm": "B",
+      "model": "balanced",
+      "mean_image_error": 0.07949960411718132,
+      "ci_low": 0.07706658749010292,
+      "ci_high": 0.0820935866983373,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "arm": "A",
+      "model": "clean",
+      "mean_image_error": 0.14191607284243865,
+      "ci_low": 0.13897680126682502,
+      "ci_high": 0.14497885985748218,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "arm": "C",
+      "model": "targeted",
+      "mean_image_error": 0.08636262866191609,
+      "ci_low": 0.0836893111638955,
+      "ci_high": 0.08916872525732383,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    }
+  ],
+  "paired_contrasts": [
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "contrast": "B-A",
+      "left": "balanced",
+      "right": "clean",
+      "left_mean_error": 0.0628846661388229,
+      "right_mean_error": 0.15497492742148322,
+      "difference": -0.09209026128266032,
+      "ci_low": -0.09404077593032463,
+      "ci_high": -0.09013427025600423,
+      "excludes_zero": true,
+      "images_worse_under_left": 626,
+      "images_unchanged": 2581,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "contrast": "C-A",
+      "left": "targeted",
+      "right": "clean",
+      "left_mean_error": 0.06314858801794669,
+      "right_mean_error": 0.15497492742148322,
+      "difference": -0.09182633940353656,
+      "ci_low": -0.09375659804697811,
+      "ci_high": -0.08976728688308261,
+      "excludes_zero": true,
+      "images_worse_under_left": 660,
+      "images_unchanged": 2527,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "contrast": "C-B",
+      "left": "targeted",
+      "right": "balanced",
+      "left_mean_error": 0.06314858801794669,
+      "right_mean_error": 0.0628846661388229,
+      "difference": 0.0002639218791237797,
+      "ci_low": -0.0012035497492742147,
+      "ci_high": 0.0017393111638954867,
+      "excludes_zero": false,
+      "images_worse_under_left": 2307,
+      "images_unchanged": 7199,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "contrast": "B-A",
+      "left": "balanced",
+      "right": "clean",
+      "left_mean_error": 0.08272895223013987,
+      "right_mean_error": 0.16278965426233835,
+      "difference": -0.08006070203219846,
+      "ci_low": -0.08233847980997623,
+      "ci_high": -0.07780925046186328,
+      "excludes_zero": true,
+      "images_worse_under_left": 1011,
+      "images_unchanged": 2475,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "contrast": "C-A",
+      "left": "targeted",
+      "right": "clean",
+      "left_mean_error": 0.06996569015571391,
+      "right_mean_error": 0.16278965426233835,
+      "difference": -0.09282396410662445,
+      "ci_low": -0.09499346793349168,
+      "ci_high": -0.09073621008181577,
+      "excludes_zero": true,
+      "images_worse_under_left": 844,
+      "images_unchanged": 2384,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "contrast": "C-B",
+      "left": "targeted",
+      "right": "balanced",
+      "left_mean_error": 0.06996569015571391,
+      "right_mean_error": 0.08272895223013987,
+      "difference": -0.01276326207442597,
+      "ci_low": -0.014476642913697546,
+      "ci_high": -0.010983834784903673,
+      "excludes_zero": true,
+      "images_worse_under_left": 2248,
+      "images_unchanged": 6229,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "contrast": "B-A",
+      "left": "balanced",
+      "right": "clean",
+      "left_mean_error": 0.06479282132488784,
+      "right_mean_error": 0.1704935339139615,
+      "difference": -0.10570071258907364,
+      "ci_low": -0.10792306677223544,
+      "ci_high": -0.1034913565584587,
+      "excludes_zero": true,
+      "images_worse_under_left": 583,
+      "images_unchanged": 2346,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "contrast": "C-A",
+      "left": "targeted",
+      "right": "clean",
+      "left_mean_error": 0.0639245183425706,
+      "right_mean_error": 0.1704935339139615,
+      "difference": -0.10656901557139087,
+      "ci_low": -0.10863664555291633,
+      "ci_high": -0.10432297439957773,
+      "excludes_zero": true,
+      "images_worse_under_left": 612,
+      "images_unchanged": 2270,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "contrast": "C-B",
+      "left": "targeted",
+      "right": "balanced",
+      "left_mean_error": 0.0639245183425706,
+      "right_mean_error": 0.06479282132488784,
+      "difference": -0.000868302982317234,
+      "ci_low": -0.0023384798099762467,
+      "ci_high": 0.0006443652678807054,
+      "excludes_zero": false,
+      "images_worse_under_left": 2307,
+      "images_unchanged": 7279,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "contrast": "B-A",
+      "left": "balanced",
+      "right": "clean",
+      "left_mean_error": 0.07413143309580364,
+      "right_mean_error": 0.14785748218527317,
+      "difference": -0.07372604908946952,
+      "ci_low": -0.075503008709422,
+      "ci_high": -0.07186690419635788,
+      "excludes_zero": true,
+      "images_worse_under_left": 907,
+      "images_unchanged": 2779,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "contrast": "C-A",
+      "left": "targeted",
+      "right": "clean",
+      "left_mean_error": 0.08207442596991289,
+      "right_mean_error": 0.14785748218527317,
+      "difference": -0.06578305621536025,
+      "ci_low": -0.0675756927949327,
+      "ci_high": -0.06386349960411719,
+      "excludes_zero": true,
+      "images_worse_under_left": 1223,
+      "images_unchanged": 2794,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "contrast": "C-B",
+      "left": "targeted",
+      "right": "balanced",
+      "left_mean_error": 0.08207442596991289,
+      "right_mean_error": 0.07413143309580364,
+      "difference": 0.007942992874109264,
+      "ci_low": 0.006470308788598575,
+      "ci_high": 0.009380839271575615,
+      "excludes_zero": true,
+      "images_worse_under_left": 3518,
+      "images_unchanged": 6398,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "contrast": "B-A",
+      "left": "balanced",
+      "right": "clean",
+      "left_mean_error": 0.09145209817893903,
+      "right_mean_error": 0.1216880443388757,
+      "difference": -0.030235946159936657,
+      "ci_low": -0.03227268408551069,
+      "ci_high": -0.028221456848772763,
+      "excludes_zero": true,
+      "images_worse_under_left": 2399,
+      "images_unchanged": 4194,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "contrast": "C-A",
+      "left": "targeted",
+      "right": "clean",
+      "left_mean_error": 0.09164212193190815,
+      "right_mean_error": 0.1216880443388757,
+      "difference": -0.030045922406967535,
+      "ci_low": -0.03196532066508313,
+      "ci_high": -0.028082026920031672,
+      "excludes_zero": true,
+      "images_worse_under_left": 2417,
+      "images_unchanged": 4289,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "contrast": "C-B",
+      "left": "targeted",
+      "right": "balanced",
+      "left_mean_error": 0.09164212193190815,
+      "right_mean_error": 0.09145209817893903,
+      "difference": 0.00019002375296912132,
+      "ci_low": -0.0014885985748218525,
+      "ci_high": 0.0019920823436262868,
+      "excludes_zero": false,
+      "images_worse_under_left": 3690,
+      "images_unchanged": 5650,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "contrast": "B-A",
+      "left": "balanced",
+      "right": "clean",
+      "left_mean_error": 0.07949960411718132,
+      "right_mean_error": 0.14191607284243865,
+      "difference": -0.06241646872525733,
+      "ci_low": -0.06447205067300078,
+      "ci_high": -0.06043657957244655,
+      "excludes_zero": true,
+      "images_worse_under_left": 1309,
+      "images_unchanged": 3716,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "contrast": "C-A",
+      "left": "targeted",
+      "right": "clean",
+      "left_mean_error": 0.08636262866191607,
+      "right_mean_error": 0.14191607284243865,
+      "difference": -0.05555344418052256,
+      "ci_low": -0.05743182897862234,
+      "ci_high": -0.05352636579572447,
+      "excludes_zero": true,
+      "images_worse_under_left": 1561,
+      "images_unchanged": 3677,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "contrast": "C-B",
+      "left": "targeted",
+      "right": "balanced",
+      "left_mean_error": 0.08636262866191607,
+      "right_mean_error": 0.07949960411718132,
+      "difference": 0.006863024544734759,
+      "ci_low": 0.005482026920031672,
+      "ci_high": 0.00828226444972288,
+      "excludes_zero": true,
+      "images_worse_under_left": 3445,
+      "images_unchanged": 6436,
+      "images": 12630,
+      "draws": 2000,
+      "interval_assumption": "percentile interval over 2000 paired resamples of the 12630 test images; assumes independent image-level sampling, which is likely violated by repeated images of the same physical signs, so it is not a definitive population-level confidence interval and does not account for physical-sign dependence"
+    }
+  ],
+  "across_seeds": [
+    {
+      "suite": "frozen",
+      "contrast": "B-A",
+      "seeds": 3,
+      "seed_list": "42 43 44",
+      "mean_difference": -0.09261722530131082,
+      "min_difference": -0.10570071258907364,
+      "max_difference": -0.08006070203219846,
+      "range": 0.025640010556875176,
+      "seeds_favouring_left": 3,
+      "seeds_favouring_right": 0,
+      "paired_intervals_excluding_zero": 3,
+      "direction": "consistent: left lower at every seed"
+    },
+    {
+      "suite": "frozen",
+      "contrast": "C-A",
+      "seeds": 3,
+      "seed_list": "42 43 44",
+      "mean_difference": -0.09707310636051729,
+      "min_difference": -0.10656901557139087,
+      "max_difference": -0.09182633940353656,
+      "range": 0.01474267616785431,
+      "seeds_favouring_left": 3,
+      "seeds_favouring_right": 0,
+      "paired_intervals_excluding_zero": 3,
+      "direction": "consistent: left lower at every seed"
+    },
+    {
+      "suite": "frozen",
+      "contrast": "C-B",
+      "seeds": 3,
+      "seed_list": "42 43 44",
+      "mean_difference": -0.004455881059206475,
+      "min_difference": -0.01276326207442597,
+      "max_difference": 0.0002639218791237797,
+      "range": 0.013027183953549749,
+      "seeds_favouring_left": 2,
+      "seeds_favouring_right": 1,
+      "paired_intervals_excluding_zero": 1,
+      "direction": "seed-sensitive: 2 of 3 seeds favour the left arm, so the direction is inconclusive"
+    },
+    {
+      "suite": "heldout",
+      "contrast": "B-A",
+      "seeds": 3,
+      "seed_list": "42 43 44",
+      "mean_difference": -0.0554594879915545,
+      "min_difference": -0.07372604908946952,
+      "max_difference": -0.030235946159936657,
+      "range": 0.043490102929532856,
+      "seeds_favouring_left": 3,
+      "seeds_favouring_right": 0,
+      "paired_intervals_excluding_zero": 3,
+      "direction": "consistent: left lower at every seed"
+    },
+    {
+      "suite": "heldout",
+      "contrast": "C-A",
+      "seeds": 3,
+      "seed_list": "42 43 44",
+      "mean_difference": -0.05046080760095012,
+      "min_difference": -0.06578305621536025,
+      "max_difference": -0.030045922406967535,
+      "range": 0.03573713380839272,
+      "seeds_favouring_left": 3,
+      "seeds_favouring_right": 0,
+      "paired_intervals_excluding_zero": 3,
+      "direction": "consistent: left lower at every seed"
+    },
+    {
+      "suite": "heldout",
+      "contrast": "C-B",
+      "seeds": 3,
+      "seed_list": "42 43 44",
+      "mean_difference": 0.0049986803906043814,
+      "min_difference": 0.00019002375296912132,
+      "max_difference": 0.007942992874109264,
+      "range": 0.007752969121140142,
+      "seeds_favouring_left": 0,
+      "seeds_favouring_right": 3,
+      "paired_intervals_excluding_zero": 2,
+      "direction": "consistent: right lower at every seed"
+    }
+  ],
+  "clean_performance": [
+    {
+      "arm": "A",
+      "model": "clean",
+      "seed": 42,
+      "clean_accuracy": 0.98646080760095,
+      "clean_macro_f1": 0.9820150393639018,
+      "clean_loss": 0.054051161093216
+    },
+    {
+      "arm": "A",
+      "model": "clean",
+      "seed": 43,
+      "clean_accuracy": 0.982185273159145,
+      "clean_macro_f1": 0.965023282539562,
+      "clean_loss": 0.0938220823539008
+    },
+    {
+      "arm": "A",
+      "model": "clean",
+      "seed": 44,
+      "clean_accuracy": 0.9772763262074426,
+      "clean_macro_f1": 0.9577532121282626,
+      "clean_loss": 0.1202394055484422
+    },
+    {
+      "arm": "B",
+      "model": "balanced",
+      "seed": 42,
+      "clean_accuracy": 0.98646080760095,
+      "clean_macro_f1": 0.979884375482687,
+      "clean_loss": 0.0487574788751353
+    },
+    {
+      "arm": "B",
+      "model": "balanced",
+      "seed": 43,
+      "clean_accuracy": 0.9789390340459224,
+      "clean_macro_f1": 0.966356885888066,
+      "clean_loss": 0.0746453486641047
+    },
+    {
+      "arm": "B",
+      "model": "balanced",
+      "seed": 44,
+      "clean_accuracy": 0.9821060965954076,
+      "clean_macro_f1": 0.96782457639275,
+      "clean_loss": 0.0733210970035784
+    },
+    {
+      "arm": "C",
+      "model": "targeted",
+      "seed": 42,
+      "clean_accuracy": 0.9831353919239904,
+      "clean_macro_f1": 0.9757863613405384,
+      "clean_loss": 0.0724509746257307
+    },
+    {
+      "arm": "C",
+      "model": "targeted",
+      "seed": 43,
+      "clean_accuracy": 0.9831353919239904,
+      "clean_macro_f1": 0.976710348391566,
+      "clean_loss": 0.0606407534068572
+    },
+    {
+      "arm": "C",
+      "model": "targeted",
+      "seed": 44,
+      "clean_accuracy": 0.9803642121931908,
+      "clean_macro_f1": 0.9658745486055708,
+      "clean_loss": 0.0733061087822876
+    }
+  ],
+  "clean_tradeoff": [
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "contrast": "B-A",
+      "clean_accuracy_cost": 0.0,
+      "corrupted_error_change": -0.09209026128266032,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "contrast": "C-A",
+      "clean_accuracy_cost": 0.0033254156769596532,
+      "corrupted_error_change": -0.09182633940353656,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "contrast": "C-B",
+      "clean_accuracy_cost": 0.0033254156769596532,
+      "corrupted_error_change": 0.0002639218791237797,
+      "exceeds_clean_limit": false,
+      "verdict": "no corrupted gain"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "contrast": "B-A",
+      "clean_accuracy_cost": 0.0032462391132225266,
+      "corrupted_error_change": -0.08006070203219846,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "contrast": "C-A",
+      "clean_accuracy_cost": -0.000950118764845409,
+      "corrupted_error_change": -0.09282396410662445,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "contrast": "C-B",
+      "clean_accuracy_cost": -0.004196357878067936,
+      "corrupted_error_change": -0.01276326207442597,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "contrast": "B-A",
+      "clean_accuracy_cost": -0.004829770387964949,
+      "corrupted_error_change": -0.10570071258907364,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "contrast": "C-A",
+      "clean_accuracy_cost": -0.003087885985748162,
+      "corrupted_error_change": -0.10656901557139087,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "contrast": "C-B",
+      "clean_accuracy_cost": 0.0017418844022167868,
+      "corrupted_error_change": -0.000868302982317234,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "contrast": "B-A",
+      "clean_accuracy_cost": 0.0,
+      "corrupted_error_change": -0.07372604908946952,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "contrast": "C-A",
+      "clean_accuracy_cost": 0.0033254156769596532,
+      "corrupted_error_change": -0.06578305621536025,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "contrast": "C-B",
+      "clean_accuracy_cost": 0.0033254156769596532,
+      "corrupted_error_change": 0.007942992874109264,
+      "exceeds_clean_limit": false,
+      "verdict": "no corrupted gain"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "contrast": "B-A",
+      "clean_accuracy_cost": 0.0032462391132225266,
+      "corrupted_error_change": -0.030235946159936657,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "contrast": "C-A",
+      "clean_accuracy_cost": -0.000950118764845409,
+      "corrupted_error_change": -0.030045922406967535,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "contrast": "C-B",
+      "clean_accuracy_cost": -0.004196357878067936,
+      "corrupted_error_change": 0.00019002375296912132,
+      "exceeds_clean_limit": false,
+      "verdict": "no corrupted gain"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "contrast": "B-A",
+      "clean_accuracy_cost": -0.004829770387964949,
+      "corrupted_error_change": -0.06241646872525733,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "contrast": "C-A",
+      "clean_accuracy_cost": -0.003087885985748162,
+      "corrupted_error_change": -0.05555344418052256,
+      "exceeds_clean_limit": false,
+      "verdict": "improvement within the clean-accuracy limit"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "contrast": "C-B",
+      "clean_accuracy_cost": 0.0017418844022167868,
+      "corrupted_error_change": 0.006863024544734759,
+      "exceeds_clean_limit": false,
+      "verdict": "no corrupted gain"
+    }
+  ],
+  "class_balanced_error": [
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "arm": "B",
+      "model": "balanced",
+      "class_balanced_error": 0.08091718804264304,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "arm": "A",
+      "model": "clean",
+      "class_balanced_error": 0.17099454024766628,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "arm": "C",
+      "model": "targeted",
+      "class_balanced_error": 0.08639484331718912,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "arm": "B",
+      "model": "balanced",
+      "class_balanced_error": 0.11240503558687752,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "arm": "A",
+      "model": "clean",
+      "class_balanced_error": 0.18435559852180178,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "arm": "C",
+      "model": "targeted",
+      "class_balanced_error": 0.09708207641171071,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "arm": "B",
+      "model": "balanced",
+      "class_balanced_error": 0.08681519440345695,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "arm": "A",
+      "model": "clean",
+      "class_balanced_error": 0.18970656056672236,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "arm": "C",
+      "model": "targeted",
+      "class_balanced_error": 0.0905210313778396,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "arm": "B",
+      "model": "balanced",
+      "class_balanced_error": 0.10022722388759801,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "arm": "A",
+      "model": "clean",
+      "class_balanced_error": 0.16717530990187207,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "arm": "C",
+      "model": "targeted",
+      "class_balanced_error": 0.11406537079966807,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "arm": "B",
+      "model": "balanced",
+      "class_balanced_error": 0.12598329334261588,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "arm": "A",
+      "model": "clean",
+      "class_balanced_error": 0.14986282524201633,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "arm": "C",
+      "model": "targeted",
+      "class_balanced_error": 0.12556110102682397,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "arm": "B",
+      "model": "balanced",
+      "class_balanced_error": 0.10880414277105883,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "arm": "A",
+      "model": "clean",
+      "class_balanced_error": 0.167527172814827,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "arm": "C",
+      "model": "targeted",
+      "class_balanced_error": 0.12175234332831905,
+      "classes": 43,
+      "classes_defined": 43,
+      "images": 12630,
+      "status": "descriptive, no interval, enters no decision rule"
+    }
+  ],
+  "class_balanced_contrasts": [
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "contrast": "B-A",
+      "left": "balanced",
+      "right": "clean",
+      "mean_difference": -0.09007735220502326,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "contrast": "C-A",
+      "left": "targeted",
+      "right": "clean",
+      "mean_difference": -0.08459969693047717,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 42,
+      "contrast": "C-B",
+      "left": "targeted",
+      "right": "balanced",
+      "mean_difference": 0.0054776552745460765,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "contrast": "B-A",
+      "left": "balanced",
+      "right": "clean",
+      "mean_difference": -0.07195056293492424,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "contrast": "C-A",
+      "left": "targeted",
+      "right": "clean",
+      "mean_difference": -0.08727352211009103,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 43,
+      "contrast": "C-B",
+      "left": "targeted",
+      "right": "balanced",
+      "mean_difference": -0.015322959175166795,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "contrast": "B-A",
+      "left": "balanced",
+      "right": "clean",
+      "mean_difference": -0.1028913661632654,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "contrast": "C-A",
+      "left": "targeted",
+      "right": "clean",
+      "mean_difference": -0.09918552918888274,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "frozen",
+      "seed": 44,
+      "contrast": "C-B",
+      "left": "targeted",
+      "right": "balanced",
+      "mean_difference": 0.0037058369743826433,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "contrast": "B-A",
+      "left": "balanced",
+      "right": "clean",
+      "mean_difference": -0.06694808601427409,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "contrast": "C-A",
+      "left": "targeted",
+      "right": "clean",
+      "mean_difference": -0.05310993910220402,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 42,
+      "contrast": "C-B",
+      "left": "targeted",
+      "right": "balanced",
+      "mean_difference": 0.013838146912070066,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "contrast": "B-A",
+      "left": "balanced",
+      "right": "clean",
+      "mean_difference": -0.023879531899400456,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "contrast": "C-A",
+      "left": "targeted",
+      "right": "clean",
+      "mean_difference": -0.024301724215192368,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 43,
+      "contrast": "C-B",
+      "left": "targeted",
+      "right": "balanced",
+      "mean_difference": -0.00042219231579191204,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "contrast": "B-A",
+      "left": "balanced",
+      "right": "clean",
+      "mean_difference": -0.058723030043768165,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "contrast": "C-A",
+      "left": "targeted",
+      "right": "clean",
+      "mean_difference": -0.04577482948650794,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    },
+    {
+      "suite": "heldout",
+      "seed": 44,
+      "contrast": "C-B",
+      "left": "targeted",
+      "right": "balanced",
+      "mean_difference": 0.012948200557260214,
+      "classes": 43,
+      "status": "descriptive, no interval, enters no decision rule"
+    }
+  ],
+  "validation_reproduction": [
+    {
+      "suite": "frozen",
+      "contrast": "B-A",
+      "validation_mean_difference": -0.0885205992509363,
+      "test_mean_difference": -0.09261722530131082,
+      "validation_seeds_favouring_left": 3,
+      "test_seeds_favouring_left": 3,
+      "validation_direction": "consistent: left lower at every seed",
+      "test_direction": "consistent: left lower at every seed",
+      "directions_agree": true,
+      "test_seed_differences": "42:-0.0921 43:-0.0801 44:-0.1057",
+      "unit_of_analysis": "validation resampled 178 physical signs; the test split has no track structure and resamples 12630 images, so the two intervals are not comparable and none is reported here",
+      "models": 9
+    },
+    {
+      "suite": "frozen",
+      "contrast": "C-A",
+      "validation_mean_difference": -0.0918705784436121,
+      "test_mean_difference": -0.09707310636051729,
+      "validation_seeds_favouring_left": 3,
+      "test_seeds_favouring_left": 3,
+      "validation_direction": "consistent: left lower at every seed",
+      "test_direction": "consistent: left lower at every seed",
+      "directions_agree": true,
+      "test_seed_differences": "42:-0.0918 43:-0.0928 44:-0.1066",
+      "unit_of_analysis": "validation resampled 178 physical signs; the test split has no track structure and resamples 12630 images, so the two intervals are not comparable and none is reported here",
+      "models": 9
+    },
+    {
+      "suite": "frozen",
+      "contrast": "C-B",
+      "validation_mean_difference": -0.0033499791926758,
+      "test_mean_difference": -0.004455881059206475,
+      "validation_seeds_favouring_left": 3,
+      "test_seeds_favouring_left": 2,
+      "validation_direction": "consistent: left lower at every seed",
+      "test_direction": "seed-sensitive: 2 of 3 seeds favour the left arm, so the direction is inconclusive",
+      "directions_agree": false,
+      "test_seed_differences": "42:+0.0003 43:-0.0128 44:-0.0009",
+      "unit_of_analysis": "validation resampled 178 physical signs; the test split has no track structure and resamples 12630 images, so the two intervals are not comparable and none is reported here",
+      "models": 9
+    },
+    {
+      "suite": "heldout",
+      "contrast": "B-A",
+      "validation_mean_difference": -0.0524294631710362,
+      "test_mean_difference": -0.0554594879915545,
+      "validation_seeds_favouring_left": 3,
+      "test_seeds_favouring_left": 3,
+      "validation_direction": "consistent: left lower at every seed",
+      "test_direction": "consistent: left lower at every seed",
+      "directions_agree": true,
+      "test_seed_differences": "42:-0.0737 43:-0.0302 44:-0.0624",
+      "unit_of_analysis": "validation resampled 178 physical signs; the test split has no track structure and resamples 12630 images, so the two intervals are not comparable and none is reported here",
+      "models": 9
+    },
+    {
+      "suite": "heldout",
+      "contrast": "C-A",
+      "validation_mean_difference": -0.0471760299625468,
+      "test_mean_difference": -0.05046080760095012,
+      "validation_seeds_favouring_left": 3,
+      "test_seeds_favouring_left": 3,
+      "validation_direction": "consistent: left lower at every seed",
+      "test_direction": "consistent: left lower at every seed",
+      "directions_agree": true,
+      "test_seed_differences": "42:-0.0658 43:-0.0300 44:-0.0556",
+      "unit_of_analysis": "validation resampled 178 physical signs; the test split has no track structure and resamples 12630 images, so the two intervals are not comparable and none is reported here",
+      "models": 9
+    },
+    {
+      "suite": "heldout",
+      "contrast": "C-B",
+      "validation_mean_difference": 0.0052534332084893,
+      "test_mean_difference": 0.0049986803906043814,
+      "validation_seeds_favouring_left": 0,
+      "test_seeds_favouring_left": 0,
+      "validation_direction": "consistent: right lower at every seed",
+      "test_direction": "consistent: right lower at every seed",
+      "directions_agree": true,
+      "test_seed_differences": "42:+0.0079 43:+0.0002 44:+0.0069",
+      "unit_of_analysis": "validation resampled 178 physical signs; the test split has no track structure and resamples 12630 images, so the two intervals are not comparable and none is reported here",
+      "models": 9
+    }
+  ],
+  "targeted_versus_balanced": {
+    "verdict": "no advantage for the targeted weights",
+    "detail": "C is not consistently lower than B on either suite"
+  }
+}

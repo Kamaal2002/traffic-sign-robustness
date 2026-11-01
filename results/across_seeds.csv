@@ -1,0 +1,7 @@
+suite,contrast,seeds,seed_list,mean_difference,min_difference,max_difference,range,seeds_favouring_left,seeds_favouring_right,paired_intervals_excluding_zero,direction
+frozen,B-A,3,42 43 44,-0.09261722530131082,-0.10570071258907364,-0.08006070203219846,0.025640010556875176,3,0,3,consistent: left lower at every seed
+frozen,C-A,3,42 43 44,-0.09707310636051729,-0.10656901557139087,-0.09182633940353656,0.01474267616785431,3,0,3,consistent: left lower at every seed
+frozen,C-B,3,42 43 44,-0.004455881059206475,-0.01276326207442597,0.0002639218791237797,0.013027183953549749,2,1,1,"seed-sensitive: 2 of 3 seeds favour the left arm, so the direction is inconclusive"
+heldout,B-A,3,42 43 44,-0.0554594879915545,-0.07372604908946952,-0.030235946159936657,0.043490102929532856,3,0,3,consistent: left lower at every seed
+heldout,C-A,3,42 43 44,-0.05046080760095012,-0.06578305621536025,-0.030045922406967535,0.03573713380839272,3,0,3,consistent: left lower at every seed
+heldout,C-B,3,42 43 44,0.0049986803906043814,0.00019002375296912132,0.007942992874109264,0.007752969121140142,0,3,2,consistent: right lower at every seed

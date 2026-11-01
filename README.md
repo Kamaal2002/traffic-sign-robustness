@@ -2,6 +2,9 @@
 
 Kamaal Alag
 
+**Research paper:** [Evaluating Weakness-Targeted Corruption Augmentation for
+Robust Traffic Sign Recognition](paper/Traffic_Sign_Robustness.pdf)
+
 This project tests whether training a traffic-sign classifier with corruption
 augmentation aimed at its measured weaknesses improves robustness more than
 sampling corruption families uniformly. I compare clean training, balanced
@@ -63,6 +66,26 @@ lands. That is what makes the B-versus-C contrast a test of the weights rather
 than of the augmentation rate. Arm A at seed 42 is the accepted baseline
 checkpoint, reused rather than retrained.
 
+**Training.** Images are resized to 64x64 and normalised to [-1, 1]. The
+1.45M-parameter `BaselineCNN` is trained for exactly 30 epochs with AdamW at
+learning rate 1e-3 and weight decay 1e-4, cosine-annealed over the 30 epochs,
+batch size 64 and unweighted cross-entropy. The reported checkpoint is the
+epoch with the highest clean validation macro F1, with ties broken on
+validation accuracy, then loss, then the earlier epoch.
+
+**Evaluation.** Each checkpoint is scored twice, once per suite, on every
+condition in that suite. Arm C's weights come from an earlier stage:
+`src.evaluate_robustness` measured the clean baseline's per-family drops on the
+validation split before any augmented arm existed, and the resulting weights
+are hard-coded constants in `src/augmentation.py`. The validation stage
+(`src.evaluate_checkpoint`, `src.compare_models`) then scores all nine trained
+checkpoints on the validation split. The official-test stage
+(`src.run_final_test`, `src.compare_test`) is the frozen one: it runs each of
+the nine checkpoints over both suites on the 12,630 official test images, under
+a protocol pinned by SHA-256 inside the evaluation script, and writes the
+per-family, per-severity, paired-contrast and class-balanced tables reported
+here and in [docs/final_test_findings.md](docs/final_test_findings.md).
+
 **Data.** The torchvision GTSRB training archive holds 26,640 images in 888
 tracks of 30 frames, one track per physical sign, split at the track level so
 no sign contributes frames to both sides. An image-level split of this archive
@@ -78,14 +101,18 @@ a memorisation check.
 **Corruption suites.** Corruptions are synthetic transformations with five
 discrete severity levels each.
 
-| Suite | Families | Conditions |
-|---|---|---:|
-| original | brightness_bright, brightness_dark, fog, gaussian_blur, gaussian_noise, occlusion | 31 |
-| held-out | contrast_reduction, jpeg_compression, motion_blur, rotation, salt_pepper | 26 |
+| Suite | Families | Corrupted conditions | Total evaluated |
+|---|---|---:|---:|
+| original | brightness_bright, brightness_dark, fog, gaussian_blur, gaussian_noise, occlusion | 30 | 31 |
+| held-out | contrast_reduction, jpeg_compression, motion_blur, rotation, salt_pepper | 25 | 26 |
 
-Each suite's conditions are its families at severities 1 to 5 plus one clean
-condition, which is excluded from every corruption-error average and reported
-separately. The code and result files name them `frozen` and `heldout`. The
+A suite's corrupted conditions are its families at severities 1 to 5: six
+families give 30, five give 25. Each suite also evaluates one clean
+reference condition, which is where the "total evaluated" column's extra
+entry comes from. The clean condition is excluded from every
+corruption-error average and reported separately, so the primary metric
+averages over 30 conditions on the original suite and 25 on the held-out
+suite. The code and result files name them `frozen` and `heldout`. The
 held-out suite holds out corruption *types*, not images: both suites are
 applied to the same 12,630 official test images, so it measures transfer to
 unseen perturbations rather than generalisation to new signs or cameras.
@@ -108,7 +135,8 @@ use the same official test images.
 | original | 0.1628 | 0.0701 | 0.0657 |
 | held-out | 0.1372 | 0.0817 | 0.0867 |
 
-Paired within-image contrasts, negative favouring the left arm:
+Paired contrasts at matched training seeds, negative favouring the left
+arm:
 
 | Suite | Contrast | Mean | Seed 42 | Seed 43 | Seed 44 | Favouring left |
 |---|---|---:|---:|---:|---:|---|
@@ -142,10 +170,49 @@ Clean test accuracy is about 98.2 percent for all three policies: 0.9820,
 arm pays a meaningful clean-accuracy cost for its robustness. The per-family
 and per-severity breakdowns, the bootstrap procedure and its assumptions, the
 validation-against-test comparison and the class-balanced sensitivity analysis
-are in [docs/final_test_findings.md](docs/final_test_findings.md). The interval
-endpoints and the full per-class tables stay in `paired_contrasts.csv` and
-`per_class_recall.csv` under `artifacts/analysis/final_test/`, which is not
-committed.
+are in [docs/final_test_findings.md](docs/final_test_findings.md). The
+bootstrap interval endpoints are in
+[results/paired_contrasts.csv](results/paired_contrasts.csv) and the full
+per-class tables in
+[results/per_class_recall.csv](results/per_class_recall.csv).
+
+## Published experimental results
+
+[results/](results/) holds the aggregate analysis tables written by
+`src.compare_test` at the end of the official-test evaluation, the provenance
+record written beside them, and the baseline validation summary the targeted
+weights were derived from. Every aggregate result quoted in this README, in
+the findings and in the manuscript is read from these files, so the reported
+findings can be inspected, and the four figures rebuilt, without retraining
+the nine checkpoints. The one table the run wrote that is not here as its own
+file, the validation-against-test comparison, is embedded in
+`comparison.json`.
+
+| File | Contents |
+|---|---|
+| [arm_error_rates.csv](results/arm_error_rates.csv) | Mean per-image corruption error for each arm, seed and suite, with bootstrap interval endpoints |
+| [across_seeds.csv](results/across_seeds.csv) | Each contrast summarised over the three seeds: mean, range, and the count of seeds favouring each arm |
+| [paired_contrasts.csv](results/paired_contrasts.csv) | The 18 paired differences (B−A, C−A, C−B) at matched seeds, with interval endpoints |
+| [per_family_contrasts.csv](results/per_family_contrasts.csv) | The same contrasts split by corruption family |
+| [per_severity_contrasts.csv](results/per_severity_contrasts.csv) | The same contrasts split by severity level |
+| [per_class_recall.csv](results/per_class_recall.csv) | Clean recall and mean corrupted recall for each of the 43 classes, per checkpoint and suite, with each class's test support |
+| [class_balanced_error.csv](results/class_balanced_error.csv) | Arm error under the class-balanced metric |
+| [class_balanced_contrasts.csv](results/class_balanced_contrasts.csv) | Paired contrasts under the class-balanced metric |
+| [clean_performance.csv](results/clean_performance.csv) | Clean test accuracy, macro F1 and loss for each of the nine checkpoints |
+| [clean_tradeoff.csv](results/clean_tradeoff.csv) | Clean-accuracy cost against corrupted-error change per contrast, with the protocol's 0.01 reporting limit applied |
+| [design_effect_sensitivity.csv](results/design_effect_sensitivity.csv) | What the paired intervals would become if the test images were clustered in groups of 30 at perfect within-cluster correlation. An assumption-dependent illustration, not a corrected interval and not an input to the decision rule |
+| [comparison.json](results/comparison.json) | Provenance for the run: split and namespace, per-checkpoint digests and selected epochs, the frozen protocol settings and the decision rule. It also embeds seven of the tables above, all but the per-family, per-severity and per-class breakdowns and the design-effect illustration, plus the validation-against-test rows. `src.plot_paper_figures` reads it to establish which split the directory came from |
+| [baseline_validation_summary.csv](results/baseline_validation_summary.csv) | The clean baseline's loss, accuracy and macro F1 on the validation split at every family and severity, over the 5,340 validation images. Its per-family accuracy drops are what the targeted probabilities were derived from. Measured on checkpoint MD5 `7c6ea3f9773d7a644235463d6a02bf0f` at epoch 21, the same checkpoint `comparison.json` records for arm A at seed 42. Written by `src.evaluate_robustness` as `artifacts/robustness/baseline/summary.csv` and renamed here |
+
+These are derived results, not model checkpoints and not per-image
+predictions. All but the last are copied unmodified from the completed
+official-test run, which evaluated nine checkpoints across three training
+strategies over both suites; `baseline_validation_summary.csv` is copied
+unmodified from the earlier validation-split measurement of the clean baseline
+that fixed the targeted weights. They are the recorded output of those runs
+rather than a regeneration of them. Rerunning the training code does not
+guarantee the same numbers: the checkpoints are not published, and backends
+differ in kernels and reduction orders.
 
 ## Figures
 
@@ -199,12 +266,18 @@ official-test stage, which needs a checkpoint inventory that is not committed
 and that no module here generates. *Reproducing the reported numbers* is not
 expected to match bit for bit, since checkpoints and predictions are not
 committed and different backends use different kernels and reduction orders.
-*Regenerating the committed figures from the original analysis tables* is not
-possible from a clone: the plotting script reads the Git-ignored
-`artifacts/analysis/final_test/`, and refuses any analysis directory that does
-not record the official test split. The figures can be regenerated only after
-the official-test evaluation and comparison stages have been rerun, and then
-from that rerun's numbers. Section 1 of the guide has the detail.
+*Inspecting the reported results* needs neither: the aggregate tables are in
+[results/](results/), together with the provenance record the plotting script
+checks. On a fresh clone, with nothing trained and no image decoded,
+
+```sh
+.venv/bin/python -m src.plot_paper_figures \
+    --analysis-dir results --figure-dir /tmp/figures
+```
+
+rebuilds all four figures from the published tables. On the pinned
+`matplotlib==3.11.2` the PNGs it writes are byte-for-byte identical to the
+ones committed under `figures/`. Section 1 of the guide has the detail.
 
 Quick start, from the project root:
 
@@ -235,13 +308,64 @@ A fourth check, `src.verify_augmentation`, needs the uncommitted baseline
 checkpoint and so fails on a fresh clone. Section 4 of the guide has the
 detail.
 
-One training run, as an example of the three entry points, and the figure
-command once `artifacts/analysis/final_test/` exists:
+The nine training runs use three entry points. `src.train` produces the
+accepted arm-A baseline at seed 42; `src.train_clean` produces the other two
+arm-A seeds; `src.train_augmented` produces both augmented arms.
 
 ```sh
-.venv/bin/python -m src.train_augmented --policy balanced --seed 42
+.venv/bin/python -m src.train
+.venv/bin/python -m src.train_clean --seed 43
+.venv/bin/python -m src.train_clean --seed 44
+for policy in balanced targeted; do
+  for seed in 42 43 44; do
+    .venv/bin/python -m src.train_augmented --policy "$policy" --seed "$seed"
+  done
+done
+```
+
+Validation-stage evaluation is one call per checkpoint and suite, eighteen in
+total, followed by one comparison call that takes all nine cells at once:
+
+```sh
+.venv/bin/python -m src.evaluate_checkpoint \
+    --checkpoint artifacts/augmented_balanced_seed42/best_checkpoint.pt \
+    --suite frozen
+
+models() { for arm in clean balanced targeted; do for seed in 42 43 44; do
+    printf -- '--model %s:%s:%s/%s_seed%s ' "$arm" "$seed" "$1" "$arm" "$seed"
+  done; done; }
+
+.venv/bin/python -m src.compare_models $(models artifacts/robustness)
+```
+
+The official-test stage stops here on a fresh clone. `src/evaluate_test.py`
+only evaluates checkpoints listed in
+`artifacts/robustness/checkpoint_inventory.json` with matching MD5 and SHA-256,
+that file is not committed, and no module in this repository writes one. The
+inventory has to be authored by hand before the commands below will run;
+section 8 of the guide gives the required fields.
+
+```sh
+PYTHONPATH=. .venv/bin/python -m src.verify_test_path \
+    --record-snapshot artifacts/final_test_integrity/pre_run_snapshot.json
+PYTHONPATH=. .venv/bin/python -m src.run_final_test
+PYTHONPATH=. .venv/bin/python -m src.run_final_test --execute
+PYTHONPATH=. .venv/bin/python -m src.verify_test_path --post-run \
+    --verify-snapshot artifacts/final_test_integrity/pre_run_snapshot.json
+
+.venv/bin/python -m src.compare_test $(models artifacts/final_test)
 .venv/bin/python -m src.plot_paper_figures
 ```
+
+Without `--execute`, `src.run_final_test` prints the plan and exits without
+reading an official test image. The sequence is one-shot by construction: the
+pre-run check refuses to run if `artifacts/final_test/` already exists, and the
+evaluator refuses any non-empty output directory. `src.compare_test` requires
+all nine arms and seeds and reads the validation comparison's
+`across_seeds.csv`, so the validation stage is a prerequisite rather than an
+optional diagnostic. `src.plot_paper_figures` defaults to
+`artifacts/analysis/final_test/` and refuses an analysis directory that does
+not record the official test split.
 
 ## Repository structure
 
@@ -250,7 +374,10 @@ src/        data pipeline, model, the three training entry points, the two
             corruption suites, validation and official-test evaluation and
             comparison, verification utilities and plotting scripts
 docs/       the frozen protocols, the reproduction guide, the findings
+results/    the aggregate result tables, the run's provenance record and the
+            baseline validation summary
 figures/    the four figures, PNG
+paper/      the typeset manuscript, PDF
 notebooks/  01_data_exploration.ipynb
 ```
 
@@ -263,6 +390,18 @@ notebooks/  01_data_exploration.ipynb
   [docs/final_test_deviations.md](docs/final_test_deviations.md)
 * [docs/final_test_findings.md](docs/final_test_findings.md) — the results and
   their detailed limitations
+
+**What is and is not committed.** The repository carries the source, the
+pinned `requirements.txt`, the two frozen protocols and the digests that pin
+them, the reproduction guide, the recorded deviations, the findings write-up,
+the exploration notebook, the four figures, the result files in
+[results/](results/) and the typeset manuscript. It does not carry the GTSRB
+data, the nine checkpoints, the per-image predictions, the checkpoint
+inventory, the remaining analysis outputs under
+`artifacts/analysis/final_test/`, or the manuscript's LaTeX source;
+`artifacts/` and `data/` are both Git-ignored. Every aggregate reported above
+can therefore be checked against a committed file, while regenerating those
+aggregates from scratch means rerunning the training and evaluation stages.
 
 ## Limitations
 
@@ -288,9 +427,11 @@ notebooks/  01_data_exploration.ipynb
   per-seed contrasts, both C−B, at seed 44 on the original suite and seed 43 on
   the held-out suite. Neither flip changes the predefined verdict, which needs
   C lower at all three seeds on both suites.
-* **The checkpoints and analysis artifacts are not committed.** `artifacts/` is
-  Git-ignored entirely, so reproduction means retraining, and the checkpoint
-  inventory the official-test stage requires has to be written by hand.
+* **The checkpoints are not committed.** The aggregate tables are published in
+  [results/](results/), but `artifacts/` is Git-ignored entirely, so the
+  checkpoints and per-image predictions are not available, regenerating the
+  aggregates means retraining, and the checkpoint inventory the official-test
+  stage requires has to be written by hand.
 * **Not comparable with published GTSRB numbers.** The torchvision training
   archive used here holds 26,640 images, not the commonly cited 39,209-image
   variant.
