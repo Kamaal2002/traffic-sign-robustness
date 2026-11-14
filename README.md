@@ -211,8 +211,9 @@ strategies over both suites; `baseline_validation_summary.csv` is copied
 unmodified from the earlier validation-split measurement of the clean baseline
 that fixed the targeted weights. They are the recorded output of those runs
 rather than a regeneration of them. Rerunning the training code does not
-guarantee the same numbers: the checkpoints are not published, and backends
-differ in kernels and reduction orders.
+guarantee identical results, since training can vary across backends. The
+nine accepted checkpoints are available in the
+[trained-checkpoint release](https://github.com/Kamaal2002/traffic-sign-robustness/releases/tag/v1.0-checkpoints).
 
 ## Figures
 

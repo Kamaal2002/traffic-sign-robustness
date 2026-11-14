@@ -3,30 +3,16 @@ Copyright (c) 2026 Kamaal Alag
 Scope of this license
 ---------------------
 
-The MIT License set out below covers my original work in this repository: the
-source code, the documentation, the figures, the notebook code, and the trained
-model weights distributed as a release asset.
+The MIT License below applies to my original source code, documentation,
+figures, notebook code, and trained model weights.
 
-Two things are outside that grant.
+It does not cover `paper/Traffic_Sign_Robustness.pdf`, which remains under my
+copyright and is shared for reading and citation.
 
-1. The research manuscript, paper/Traffic_Sign_Robustness.pdf, is not covered
-   by the MIT License. It remains my copyright and is published here for
-   reading and citation.
-
-2. The German Traffic Sign Recognition Benchmark (GTSRB), and material derived
-   from its images, including the sign crops displayed as figures in
-   notebooks/01_data_exploration.ipynb. GTSRB is the work of its authors and is
-   governed by their terms. No ownership of the dataset is claimed here and no
-   rights over it are granted. Anyone wishing to redistribute GTSRB images
-   should obtain them from the dataset's authors and observe their terms.
-
-The trained weights were produced by training on GTSRB. They are my own work
-and are offered under the MIT License on that basis, which says nothing about,
-and grants nothing over, the dataset they were trained on.
-
-No third-party source code is vendored into this repository. Dependencies are
-installed from their own distributions and are not redistributed here; each
-remains under its own license.
+It also does not cover GTSRB or material derived from its images, including
+the sign crops in `notebooks/01_data_exploration.ipynb`. Those materials
+remain subject to their respective owners' rights. This license grants no
+rights to the GTSRB dataset.
 
 
 MIT License
