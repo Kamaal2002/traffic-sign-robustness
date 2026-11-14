@@ -164,7 +164,7 @@ DECLARED_HELDOUT = {
 # subclasses `evaluate_checkpoint.Suite` and `compare_test.py` imports the
 # contrast list, the clean-accuracy limit and the decision rule from
 # `compare_models.py`, so an edit to either file while writing the test modules
-# would move a committed validation number, or the rule that reads it, without
+# would move an accepted validation number, or the rule that reads it, without
 # tripping any other gate.
 FROZEN_MODULES = (
     "src/corruptions.py",

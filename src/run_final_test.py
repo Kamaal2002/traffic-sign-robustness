@@ -12,10 +12,10 @@ Three properties the wrapper exists to provide.
 
 **A predetermined order.** The sequence is the checkpoint inventory's own row
 order - A42, A43, A44, B42, B43, B44, C42, C43, C44 - with the frozen suite
-before the held-out one for each checkpoint. It is read from a committed file
-rather than chosen here, and the whole plan is printed and validated before the
-first run starts, so no decision about what to run next is taken while results
-are arriving.
+before the held-out one for each checkpoint. It is read from the recorded
+inventory rather than chosen here, and the whole plan is printed and validated
+before the first run starts, so no decision about what to run next is taken
+while results are arriving.
 
 **No performance number on the console.** The evaluator prints progress and no
 metric; this wrapper adds the run counter, the clock and an estimate, and reads

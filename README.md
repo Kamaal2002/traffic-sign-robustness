@@ -261,11 +261,12 @@ reported results, from a fresh clone through the official test stage, with
 every prerequisite and one-shot restriction. Three things worth separating
 first.
 
-*Rerunning the methodology* is supported, with one manual prerequisite at the
-official-test stage, which needs a checkpoint inventory that is not committed
-and that no module here generates. *Reproducing the reported numbers* is not
-expected to match bit for bit, since checkpoints and predictions are not
-committed and different backends use different kernels and reduction orders.
+*Rerunning the methodology* is supported. The official-test stage needs a
+checkpoint inventory that is not committed and that no module here generates;
+it comes with the published checkpoints, under
+[Trained checkpoints](#trained-checkpoints) below. *Reproducing the reported
+numbers* is not expected to match bit for bit, since different backends use
+different kernels and reduction orders.
 *Inspecting the reported results* needs neither: the aggregate tables are in
 [results/](results/), together with the provenance record the plotting script
 checks. On a fresh clone, with nothing trained and no image decoded,
@@ -305,8 +306,8 @@ model and makes no prediction, so no test performance information comes out of
 it, but the test split is not completely untouched; Part 8 of
 [docs/final_test_protocol.md](docs/final_test_protocol.md) records that access.
 A fourth check, `src.verify_augmentation`, needs the uncommitted baseline
-checkpoint and so fails on a fresh clone. Section 4 of the guide has the
-detail.
+checkpoint, so on a clone it runs only once the published checkpoints are in
+place. Section 4 of the guide has the detail.
 
 The nine training runs use three entry points. `src.train` produces the
 accepted arm-A baseline at seed 42; `src.train_clean` produces the other two
@@ -341,9 +342,9 @@ models() { for arm in clean balanced targeted; do for seed in 42 43 44; do
 The official-test stage stops here on a fresh clone. `src/evaluate_test.py`
 only evaluates checkpoints listed in
 `artifacts/robustness/checkpoint_inventory.json` with matching MD5 and SHA-256,
-that file is not committed, and no module in this repository writes one. The
-inventory has to be authored by hand before the commands below will run;
-section 8 of the guide gives the required fields.
+that file is not committed, and no module in this repository writes one. It
+comes with the published checkpoints; without them the inventory has to be
+authored by hand, and section 8 of the guide gives the required fields.
 
 ```sh
 PYTHONPATH=. .venv/bin/python -m src.verify_test_path \
@@ -366,6 +367,100 @@ all nine arms and seeds and reads the validation comparison's
 optional diagnostic. `src.plot_paper_figures` defaults to
 `artifacts/analysis/final_test/` and refuses an analysis directory that does
 not record the official test split.
+
+## Trained checkpoints
+
+`artifacts/` is Git-ignored, so the nine accepted checkpoints and the
+evaluation records that bind each one to its arm and seed are not in the
+repository. They are published instead on this repository's Releases page,
+under the tag `v1.0-checkpoints`:
+
+* `traffic-sign-robustness-checkpoints-v1.0.tar.gz`
+* `SHA256SUMS.txt` — one SHA-256 per extracted file
+* `SHA256SUMS.archive.txt` — the digest of the archive itself
+
+Download all three into the project root and extract there. The archive
+carries repository-relative `artifacts/` paths, so nothing needs rearranging,
+and `.gitignore` keeps the extracted tree out of `git status`. Extraction
+writes over a file of the same name, so unpack somewhere else first if the
+working copy already holds results:
+
+```sh
+shasum -a 256 -c SHA256SUMS.archive.txt
+tar -xzf traffic-sign-robustness-checkpoints-v1.0.tar.gz
+shasum -a 256 -c SHA256SUMS.txt
+```
+
+The archive holds the nine `best_checkpoint.pt` files with whichever of the
+`history.json`, `policy.json` and `protocol.json` sidecars each run produced:
+all nine have a history, the accepted baseline predates both of the others,
+and the clean arm has no augmentation policy to record. With them come
+`checkpoint_inventory.json`, the validation-stage records for all nine arms
+and seeds on both suites, the clean baseline's per-family validation sweep
+that arm C's probabilities were derived from, and the validation comparison
+tables.
+
+The per-image validation predictions are included, for all nine checkpoints
+on both suites, so the validation tables the archive ships are re-derivable
+from it and not merely readable: `src.compare_models` rebuilds all twelve of
+them byte for byte. What the archive leaves out is the dataset, the
+official-test output and the earlier occlusion-placement stage, which is why
+`src.analyze_placement` is the one analysis entry point a download cannot
+run — it reads that stage's predictions, not the robustness sweeps'.
+
+The digests do not have to be taken on trust. Every checkpoint's MD5 and
+SHA-256 were fixed in `checkpoint_inventory.json` before the official-test
+stage ran, and `src/evaluate_test.py` recomputed both and refused any
+mismatch at every one of the eighteen runs. They are carried into the
+repository by [results/comparison.json](results/comparison.json): the MD5
+under `model_identity`, both digests under `test_provenance`. A download can
+therefore be checked against a record that predates the results rather than
+against whoever uploaded it. That holds for the nine weight files. Of the other
+150 entries, four are MD5-pinned in committed source — `ACCEPTED_ARTIFACTS` in
+`src/verify_placement.py` covers the baseline sweep's `predictions.csv`,
+`summary.csv`, `per_class_metrics.csv` and `confusion_matrices.npz` — and the
+validation across-seed means are carried in `results/comparison.json`. The
+rest are fixed only by `SHA256SUMS.txt`, which is published alongside them
+rather than independently of them.
+
+With the archive in place, the steps a clone cannot complete on its own run:
+
+```sh
+.venv/bin/python -m src.verify_augmentation
+PYTHONPATH=. .venv/bin/python -m src.verify_placement
+.venv/bin/python -m src.compare_models $(models artifacts/robustness)
+PYTHONPATH=. .venv/bin/python -m src.analyze_failures
+PYTHONPATH=. .venv/bin/python -m src.verify_test_path \
+    --record-snapshot artifacts/final_test_integrity/pre_run_snapshot.json
+PYTHONPATH=. .venv/bin/python -m src.run_final_test
+```
+
+The first needs the baseline checkpoint at a pinned MD5. The second re-derives
+the occlusion placement rule on synthetic frames and checks five accepted
+artifacts against pinned digests, among them the baseline checkpoint and its
+validation predictions. The next two rebuild the validation comparison and the
+baseline failure analysis from the per-image predictions, the first using the
+`models()` helper defined with the validation stage above. The fifth is the
+pre-run integrity battery, which among other things ties each checkpoint to
+the arm and seed its results will be filed under. The last prints and
+validates the eighteen-run plan without reading an official test image; adding
+`--execute` runs the evaluation, which the protocol budgets at 80 to 100
+minutes for all nine checkpoints on an Apple M-series GPU. The accepted run
+took 2:28:49, with one of the eighteen sweeps taking 47:51 against about five
+minutes for each of the others. After it, `src.compare_test` rebuilds the
+comparison, and the rest of the sequence is as set out above.
+
+Two limits. The checkpoints carry model weights, the training configuration and
+the recorded validation metrics, but no optimizer state, so they support
+inference rather than resumed training. And a rerun cannot promise the same
+numbers. Each corrupted input is a function of its image index and condition,
+so the inputs are reproduced exactly on any machine, with the one exception
+the held-out suite documents: `jpeg_compression` decodes through whichever
+libjpeg build `torchvision` is linked against, which is stable within an
+environment but not guaranteed across libjpeg versions. The forward pass is
+not reproduced exactly either, since CPU, MPS and CUDA use different kernels
+and reduction orders. The accepted numbers were produced on MPS with torch
+2.14.1 and Python 3.13.1.
 
 ## Repository structure
 
@@ -396,12 +491,15 @@ pinned `requirements.txt`, the two frozen protocols and the digests that pin
 them, the reproduction guide, the recorded deviations, the findings write-up,
 the exploration notebook, the four figures, the result files in
 [results/](results/) and the typeset manuscript. It does not carry the GTSRB
-data, the nine checkpoints, the per-image predictions, the checkpoint
-inventory, the remaining analysis outputs under
+data, the per-image predictions, the remaining analysis outputs under
 `artifacts/analysis/final_test/`, or the manuscript's LaTeX source;
-`artifacts/` and `data/` are both Git-ignored. Every aggregate reported above
-can therefore be checked against a committed file, while regenerating those
-aggregates from scratch means rerunning the training and evaluation stages.
+`artifacts/` and `data/` are both Git-ignored. The nine checkpoints, their
+validation records and predictions, and the checkpoint inventory are outside
+Git too, and are distributed as a release asset instead; see
+[Trained checkpoints](#trained-checkpoints). Every aggregate reported above
+can therefore be checked against a committed file, and regenerating the
+official-test aggregates means rerunning the evaluation stage from the
+published weights rather than retraining.
 
 ## Limitations
 
@@ -427,11 +525,46 @@ aggregates from scratch means rerunning the training and evaluation stages.
   per-seed contrasts, both C−B, at seed 44 on the original suite and seed 43 on
   the held-out suite. Neither flip changes the predefined verdict, which needs
   C lower at all three seeds on both suites.
-* **The checkpoints are not committed.** The aggregate tables are published in
-  [results/](results/), but `artifacts/` is Git-ignored entirely, so the
-  checkpoints and per-image predictions are not available, regenerating the
-  aggregates means retraining, and the checkpoint inventory the official-test
-  stage requires has to be written by hand.
+* **Not everything behind the results is distributed.** `artifacts/` is
+  Git-ignored entirely. The nine checkpoints, their validation records and
+  predictions, and the checkpoint inventory are published as a release asset,
+  so the official-test stage can be rerun without retraining and the
+  validation comparison and the baseline failure analysis can be rebuilt. The
+  official-test per-image output and the earlier occlusion-placement stage are
+  not distributed. A rerun on a different backend is not expected to reproduce
+  the reported numbers exactly.
 * **Not comparable with published GTSRB numbers.** The torchvision training
   archive used here holds 26,640 images, not the commonly cited 39,209-image
   variant.
+
+## Dataset
+
+The experiments use the German Traffic Sign Recognition Benchmark, downloaded
+through `torchvision.datasets.GTSRB`. The benchmark was assembled and released
+by its authors, and is described in:
+
+> J. Stallkamp, M. Schlipsing, J. Salmen and C. Igel. Man vs. computer:
+> Benchmarking machine learning algorithms for traffic sign recognition.
+> *Neural Networks*, 32:323-332, 2012.
+> <https://doi.org/10.1016/j.neunet.2012.02.016>
+
+No dataset archive is redistributed here or in the release asset. `data/` is
+Git-ignored, nothing in `src/` enables torchvision's `download` flag, and the
+archives are fetched explicitly by the snippet in *Reproducing the study*. The
+exploration notebook displays 53 sign crops as figures: one per class, eight
+samples of class 14, and the smallest and largest training images.
+
+## License
+
+The source, the documentation, the figures and the notebook code are released
+under the MIT License, as are the trained weights published under the
+`v1.0-checkpoints` tag; see [LICENSE](LICENSE).
+
+Two things sit outside that grant, both stated in the same file. The
+manuscript PDF remains my copyright and is not under the MIT License. GTSRB
+and material derived from its images, including the sign crops shown as
+figures in the exploration notebook, are governed by the dataset authors'
+terms: training on GTSRB is what produced the weights, but no ownership of the
+dataset is claimed here and no rights over it are granted. No third-party
+source is vendored into this repository; dependencies are installed from their
+own distributions rather than redistributed.

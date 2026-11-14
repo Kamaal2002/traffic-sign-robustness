@@ -9,7 +9,7 @@
 Each `--model` is `NAME:SEED:DIR` in the same format `compare_models.py` takes,
 and `DIR` is the directory `evaluate_test.py` wrote for that checkpoint.
 
-`compare_models.py` produced the committed validation comparison and is left
+`compare_models.py` produced the accepted validation comparison and is left
 byte-identical, so this is a separate module. Everything that could change a
 reported conclusion is imported from it rather than restated: the arm names and
 labels, the three contrasts and their left-minus-right orientation, the
@@ -99,7 +99,7 @@ ANALYSIS_DIR = PROJECT_ROOT / "artifacts" / "analysis" / "final_test"
 # The trees this module reads and must never write into. It cannot reuse the
 # evaluator's tuple unchanged: that one protects the whole of
 # `artifacts/analysis`, which is where this module's own output belongs, so
-# the analysis entry is narrowed to the committed validation comparison.
+# the analysis entry is narrowed to the accepted validation comparison.
 PROTECTED_TREES = (PROJECT_ROOT / "artifacts" / "baseline",
                    PROJECT_ROOT / "artifacts" / "robustness",
                    VALIDATION_ANALYSIS_DIR)
@@ -110,7 +110,7 @@ PROTECTED_TREES = (PROJECT_ROOT / "artifacts" / "baseline",
 # than materialising 2,000 means of 12,630 values at once.
 CHUNK_DRAWS = 200
 # `targeted_verdict` is imported so the rule is the same object that produced
-# the committed validation conclusion, which means its message says "per-sign".
+# the accepted validation conclusion, which means its message says "per-sign".
 # The official test release carries no track identifiers, so the unit it is
 # applied to here is the image. The rule itself is unchanged; only the data
 # under it is.
@@ -131,7 +131,7 @@ VERDICT_UNIT_NOTE = (
 # right-hand arm is A, and disagree only on C-B.
 #
 # The implementation follows the right-hand arm. That is what the named
-# function does, the function is frozen and produced the committed validation
+# function does, the function is frozen and produced the accepted validation
 # table, the paragraph that names it is specific about the C-B row, and Part 1
 # question 4 asks the question the same way. Reading it the other way would
 # make the test path's trade-off column incomparable with the validation one,
@@ -647,7 +647,7 @@ def validation_reproduction_rows(models, test_seed_table, test_contrasts,
                                  validation_dir=None):
     """Whether the official test split reproduces each validation conclusion.
 
-    Reads the committed validation across-seed summary and sets it beside the
+    Reads the accepted validation across-seed summary and sets it beside the
     test one, contrast by contrast and suite by suite. The validation directory
     is opened read-only and nothing in it is rewritten.
 
@@ -777,7 +777,7 @@ def check_output_target(output_dir):
                 or output_dir in protected.parents):
             raise RuntimeError(
                 f"{output_dir} is inside, equal to, or a parent of "
-                f"{protected}, which holds committed results this module "
+                f"{protected}, which holds accepted results this module "
                 "reads. The comparison writes only to its own analysis "
                 "directory, and the read-only treatment of the validation "
                 "and baseline trees is enforced here rather than assumed.")
@@ -909,7 +909,7 @@ def compare(models, output_dir, label_index=None, inventory_path=None,
     """Run every declared comparison on the official test results and write it.
 
     `label_index`, `inventory_path` and `validation_dir` default to the real
-    ground truth, the frozen inventory and the committed validation analysis.
+    ground truth, the frozen inventory and the accepted validation analysis.
     They are parameters so the comparison logic can be exercised end to end on
     synthetic fixtures without official test predictions existing.
     """

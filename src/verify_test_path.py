@@ -141,7 +141,7 @@ SYNTHETIC_IMAGES = 96
 # The released training split, for the file-count and byte-overlap checks.
 EXPECTED_TRAIN_FILES = 26640
 
-# The trees the pre-run snapshot covers: every committed result the test stage
+# The trees the pre-run snapshot covers: every accepted result the test stage
 # must leave untouched.
 SNAPSHOT_TREES = (PROJECT_ROOT / "artifacts" / "robustness",
                   PROJECT_ROOT / "artifacts" / "analysis" / "augmentation",
@@ -219,7 +219,7 @@ def check_protocol_and_inventory():
         assert len(binding["validation_metadata"]) == len(TEST_SUITES)
         checks += 1
     print(f"  {checks} checkpoints: inventory entry found by path, md5 and "
-          "sha256 as recorded, and both committed validation result sets name "
+          "sha256 as recorded, and both accepted validation result sets name "
           "the same checkpoint")
 
     # The rejections. A path outside the inventory, and a record whose digest
@@ -248,7 +248,7 @@ def check_protocol_and_inventory():
     try:
         check_validation_binding(missing)
     except RuntimeError as error:
-        assert "no committed validation metadata" in str(error), error
+        assert "no validation metadata" in str(error), error
     else:
         raise AssertionError("a checkpoint with no validation binding was "
                              "accepted")
@@ -1264,7 +1264,7 @@ def check_comparison_math(directory):
             row["validation_direction"] == row["test_direction"])
         assert "not comparable" in row["unit_of_analysis"]
         checks += 1
-    print(f"  {len(reproduction)} reproduction rows carry the committed "
+    print(f"  {len(reproduction)} reproduction rows carry the accepted "
           "validation means unchanged beside the fixture ones, with no "
           "interval spanning the two")
 
@@ -1877,7 +1877,7 @@ def check_seed_derivation(indices=(0, 1, 7, 12629)):
 def snapshot_artifacts(trees=None, checkpoints=None):
     """The pre-run halves of Part 10 checks 9 and 11.
 
-    One digest per file under the committed result trees, and a digest and file
+    One digest per file under the accepted result trees, and a digest and file
     mode per approved checkpoint. Taken before the test evaluation and
     re-verified after it, because the checkpoint files are mode 0644 rather
     than read-only, so it is the snapshot and not the filesystem that
@@ -1950,7 +1950,7 @@ def check_snapshot_mechanism(directory, record_to=None):
           "missing, which is the comparison --verify-snapshot runs against "
           "the file step 1 recorded")
 
-    # A tamper test on copies, so no committed artifact is touched.
+    # A tamper test on copies, so no accepted artifact is touched.
     copied = directory / "copy"
     copied.mkdir()
     original = sorted(snapshot["files"])[0]
@@ -2330,7 +2330,7 @@ def stubbed_evaluator(access_log, size=SYNTHETIC_IMAGES, failure=None):
             "verified": ["synthetic stand-in"], "unverifiable": []},
         "check_validation_binding": lambda record: {
             "validation_metadata": {"frozen": "synthetic stand-in"},
-            "established_by": "a synthetic stand-in, not a committed run"},
+            "established_by": "a synthetic stand-in, not an accepted run"},
         "evaluate_condition": inference,
         "append_access_log": log_append,
     }
@@ -2912,7 +2912,7 @@ def check_recorded_snapshot(path):
     result = verify_artifact_snapshot(snapshot)
     assert not result["changed"], result["changed"]
     assert not result["missing"], result["missing"]
-    print(f"  {result['files']} committed artifacts and "
+    print(f"  {result['files']} accepted artifacts and "
           f"{result['checkpoints']} checkpoints are byte-identical to "
           f"{evaluate_test._repository_path(target)}, recorded before the "
           "sequence ran, and the checkpoints carry the same file modes")

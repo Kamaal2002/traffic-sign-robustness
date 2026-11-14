@@ -22,7 +22,10 @@ the evaluation and comparison stages. The source, the two frozen protocols, the
 pinned dependency versions and the fixed seeds are all committed, with two
 exceptions, in sections 4 and 8: `src.verify_augmentation` needs the accepted
 baseline checkpoint, and the official-test stage needs a checkpoint inventory
-that is not committed and that no module in this repository generates.
+that is not committed and that no module in this repository generates. Both
+are published with the checkpoints, as the README's *Trained checkpoints*
+section sets out; the sections below state the two gaps as they stand for a
+clone that does not have them.
 
 This guide covers the three-arm comparison. It does not cover the two earlier
 stages that fixed frozen augmentation parameters. `src.evaluate_robustness`
@@ -125,8 +128,8 @@ soon as `data/` is populated:
 .venv/bin/python -m src.verify_corruptions
 ```
 
-The fourth needs an artifact that is not committed, so it will fail on a fresh
-clone:
+The fourth needs an artifact that is not committed, so on a clone it runs only
+once the published checkpoints are extracted:
 
 ```sh
 .venv/bin/python -m src.verify_augmentation
@@ -147,10 +150,11 @@ Part 8 of [final_test_protocol.md](final_test_protocol.md) is the standing
 record of that access. `src.verify_model` deliberately iterates only `train`
 and `validation`.
 
-**`src.verify_augmentation` does not run on a fresh clone.** Its provenance
-check requires `artifacts/baseline/best_checkpoint.pt` at the MD5 pinned in
-`src/evaluate_robustness.py`, which is the accepted baseline checkpoint and is
-not committed. It passes against that file and not against a retrained one.
+**`src.verify_augmentation` needs the published baseline checkpoint.** Its
+provenance check requires `artifacts/baseline/best_checkpoint.pt` at the MD5
+pinned in `src/evaluate_robustness.py`, which is the accepted baseline
+checkpoint and is not committed. It is in the published archive. The check
+passes against that file and not against a retrained one.
 
 `src.verify_data_pipeline` prints the track and image counts the rest of the
 study depends on: 888 tracks of 30 frames, 710 training tracks and 21,300
@@ -308,13 +312,14 @@ build `validation_reproduction.csv` and has no flag pointing elsewhere.
 `artifacts/robustness/checkpoint_inventory.json` whose MD5 and SHA-256 both
 match the recorded digests. That file lives under the Git-ignored `artifacts/`
 tree, so it is not in the repository, **and no module in this repository
-generates it.** A fresh clone cannot proceed past this point without writing
-its own inventory by hand.
+generates it.** It is published with the checkpoints instead. A clone without
+that archive cannot proceed past this point without writing its own inventory
+by hand.
 
-That is a real gap in the reproduction path, not a step that was left out of
-this document. The inventory for the accepted runs was recorded while the
-validation stage was still live; nothing was written to regenerate it, and
-nothing here invents a command that does not exist.
+That no module writes it is a real gap in the reproduction path, not a step
+that was left out of this document. The inventory for the accepted runs was
+recorded while the validation stage was still live; nothing was written to
+regenerate it, and nothing here invents a command that does not exist.
 
 What the file has to contain, as read by `inventory_record`,
 `check_inventory_digests` and `check_validation_binding`: a `models` list of
@@ -431,9 +436,10 @@ figures labelled for the test split from validation numbers.
 
 ## 13. Known limitations and troubleshooting
 
-**The inventory gap is the hard blocker.** Section 8 is the one step a fresh
-clone cannot complete from committed material. Everything before it runs;
-everything after it depends on it.
+**The inventory gap is the hard blocker for a clone on its own.** Section 8
+is the one step a clone cannot complete from committed material. Everything
+before it runs, everything after it depends on it, and extracting the
+published checkpoints is what supplies it.
 
 **The official-test path cannot simply be rerun.** `--record-snapshot` refuses
 an existing snapshot file, the pre-run check refuses an existing
@@ -447,8 +453,9 @@ results aside as a conscious decision.
 augmentation manifest no longer matches its protocol, the run stops. Do not
 edit either document to get past this.
 
-**`src.verify_augmentation` failing on a fresh clone is expected.** It needs
-the accepted baseline checkpoint at a pinned MD5, which is not committed.
+**`src.verify_augmentation` failing without the published checkpoints is
+expected.** It needs the accepted baseline checkpoint at a pinned MD5, which
+is not committed.
 
 **Comparison stages fail on a partial set.** Both expect all nine cells in one
 call, for both suites. Point `models()` at the right directory root —

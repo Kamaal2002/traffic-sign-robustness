@@ -9,3 +9,7 @@ artifacts/
 # LaTeX sources and build files; the typeset PDF is the tracked output.
 paper/*
 !paper/Traffic_Sign_Robustness.pdf
+
+# The checkpoint release assets, if they are downloaded into the project root.
+traffic-sign-robustness-checkpoints-*.tar.gz
+SHA256SUMS*.txt

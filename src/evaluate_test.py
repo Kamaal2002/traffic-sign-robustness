@@ -108,7 +108,7 @@ INVENTORY_PATH = PROJECT_ROOT / "artifacts" / "robustness" / "checkpoint_invento
 VALIDATION_ROOT = PROJECT_ROOT / "artifacts" / "robustness"
 
 # Trees this module must never be able to write into: the accepted baseline,
-# the committed validation evaluations, and the committed validation analysis.
+# the accepted validation evaluations, and the accepted validation analysis.
 # Checked as paths before the model is built, so no result set can be produced
 # on top of one.
 PROTECTED_ROOTS = (PROJECT_ROOT / "artifacts" / "baseline",
@@ -413,11 +413,11 @@ def check_inventory_digests(checkpoint_path, record):
 
 
 def check_validation_binding(record):
-    """Tie the checkpoint to its arm and seed through the committed validation runs.
+    """Tie the checkpoint to its arm and seed through the accepted validation runs.
 
     What has to be established is that the file being evaluated is the one the
     arm and seed it is filed under actually produced. That was established on
-    these byte-identical files by the committed validation evaluations, so it is
+    these byte-identical files by the accepted validation evaluations, so it is
     read back from their metadata rather than re-measured: no validation
     inference runs in the test stage. JSON only.
     """
@@ -427,9 +427,11 @@ def check_validation_binding(record):
         path = VALIDATION_ROOT / f"{arm}_seed{seed}" / suite_name / "metadata.json"
         if not path.exists():
             raise RuntimeError(
-                f"no committed validation metadata at {_repository_path(path)}, "
-                f"so the {arm} seed-{seed} checkpoint is not bound to the arm "
-                "and seed this result would be filed under")
+                f"no validation metadata at {_repository_path(path)}, so "
+                f"the {arm} seed-{seed} checkpoint is not bound to the arm "
+                "and seed this result would be filed under. That file is "
+                "part of the accepted artifact set, which is not in the "
+                "repository; README.md names where it is published")
         metadata = json.loads(path.read_text())
         checkpoint = metadata.get("checkpoint") or {}
         if checkpoint.get("md5") != record["checkpoint_md5"]:
@@ -457,6 +459,9 @@ def check_validation_binding(record):
         "seed": seed,
         "checkpoint_md5": record["checkpoint_md5"],
         "validation_metadata": bound,
+        # Held at the wording the eighteen accepted runs recorded. It is
+        # written into each metadata.json, so rephrasing it would make a
+        # rerun's metadata differ from the accepted set over nothing.
         "established_by": ("the committed validation evaluations of these "
                            "byte-identical files; no validation inference was "
                            "rerun"),
@@ -683,7 +688,7 @@ def write_test_outputs(suite, results, conditions, metadata, indices, labels,
     """Write the test artifact set: the validation set, with the split's columns.
 
     A separate writer for the same reason the module is separate:
-    `evaluate_checkpoint.write_outputs` produced the committed validation
+    `evaluate_checkpoint.write_outputs` produced the accepted validation
     results and stays byte-identical. The differences are the two split-specific
     arguments - class support in place of tracks per class - and the prediction
     position column, which is named for the split it indexes.

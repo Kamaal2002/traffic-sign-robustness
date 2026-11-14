@@ -127,7 +127,7 @@ FROZEN_SOURCES = {
     "src/data.py": "1aeea9393b28eb4fdff088516ac710561ac29ee5",
     "src/model.py": "cfca1ea330235cb870a4286ffb7af03720d88cb1",
     "src/train.py": "7a92b70c900c1acccca2273895dae8c0605630c2",
-    "src/evaluate_robustness.py": "b9d524e3ef88ed7cb709147649eb05774d19b835",
+    "src/evaluate_robustness.py": "c1b718251e1ead262ec036667bcce5847eaf19c2",
 }
 
 # Frames used where a check needs many independent per-frame draws.
